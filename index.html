@@ -209,6 +209,13 @@
     display:inline-block;font-size:9.5px;font-weight:700;color:#8A6300;background:#FDE9B4;
     border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:middle;
   }
+  .edit-banner{
+    margin:14px 20px 0;background:#EFEBFF;color:#4B3FBF;font-size:12.5px;font-weight:600;
+    padding:10px 14px;border-radius:var(--radius-sm);
+  }
+  .edit-banner a{color:#4B3FBF;text-decoration:underline;cursor:pointer;}
+  .entry{cursor:pointer;}
+  .trip-card{cursor:pointer;}
   .save-btn{
     width:100%;padding:14px;border:none;border-radius:var(--radius-sm);
     background:var(--ink);color:#fff;font-size:14.5px;font-weight:700;font-family:'Inter',sans-serif;
@@ -328,9 +335,12 @@
 
   <!-- ============ ADD ============ -->
   <div class="view" id="view-add">
-    <h2 class="page-title">Add entry</h2>
-    <p class="page-sub">Log a fuel fill-up, service cost, or driver payment.</p>
-    <div class="type-tabs">
+    <h2 class="page-title" id="addTitle">Add entry</h2>
+    <p class="page-sub" id="addSub">Log a fuel fill-up, service cost, or driver payment.</p>
+    <div class="edit-banner" id="editBanner" style="display:none;">
+      Editing this entry — <a onclick="cancelEdit()">cancel</a>
+    </div>
+    <div class="type-tabs" id="typeTabs">
       <div class="type-tab active-fuel" data-type="fuel" onclick="setAddType('fuel')">⛽ Fuel</div>
       <div class="type-tab" data-type="service" onclick="setAddType('service')">🧰 Service</div>
       <div class="type-tab" data-type="driver" onclick="setAddType('driver')">🧑‍✈️ Driver</div>
@@ -431,6 +441,7 @@ let period = 'cycle'; // 'cycle' | 'week' | 'all'
 let addType = 'fuel';
 let fuelTypeSel = 'CNG';
 let histFilter = 'all';
+let editState = { kind:null, id:null };
 
 /* ================== DATE HELPERS ================== */
 function toDate(str){ return new Date(str + 'T12:00:00'); }
@@ -629,7 +640,7 @@ function renderRecent(){
   if(list.length===0){ el.innerHTML = '<div class="empty-note">No entries yet — tap + Add to log your first fill-up.</div>'; return; }
   el.innerHTML = list.map(it=>{
     const {ico,bg} = iconFor(it.kind);
-    return `<div class="entry">
+    return `<div class="entry" onclick="openEditEntry('${it.kind}','${it.id}')">
       <div class="ico" style="background:${bg}">${ico}</div>
       <div class="meta"><div class="t1">${it.title}</div><div class="t2">${fmtDate(it.date)} · ${it.sub}</div></div>
       <div class="amt">${money(it.amount)}</div>
@@ -644,11 +655,11 @@ function renderHistory(){
   if(items.length===0){ el.innerHTML = '<div class="empty-note">Nothing here yet.</div>'; return; }
   el.innerHTML = items.map(it=>{
     const {ico,bg} = iconFor(it.kind);
-    return `<div class="entry">
+    return `<div class="entry" onclick="openEditEntry('${it.kind}','${it.id}')">
       <div class="ico" style="background:${bg}">${ico}</div>
       <div class="meta"><div class="t1">${it.title}</div><div class="t2">${fmtDate(it.date)} · ${it.sub}</div></div>
       <div class="amt">${money(it.amount)}</div>
-      <button class="del-x" onclick="deleteEntry('${it.kind}','${it.id}')">✕</button>
+      <button class="del-x" onclick="event.stopPropagation(); deleteEntry('${it.kind}','${it.id}')">✕</button>
     </div>`;
   }).join('');
 }
@@ -657,13 +668,13 @@ function renderTrips(){
   const el = document.getElementById('tripList');
   if(TRIPS.length===0){ el.innerHTML = '<div class="empty-note">No trips logged yet.</div>'; return; }
   el.innerHTML = TRIPS.slice(0,20).map(t=>`
-    <div class="trip-card">
+    <div class="trip-card" onclick="openEditTrip('${t.id}')">
       <div class="ico" style="background:linear-gradient(135deg,var(--dist-a),var(--dist-b));width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;">🧭</div>
       <div class="meta">
         <div class="trip-route">${t.start_location}<span class="arrow">→</span>${t.end_location}</div>
         <div class="trip-date">${fmtDate(t.trip_date)}${t.note ? ' · '+t.note : ''}</div>
       </div>
-      <button class="del-x" onclick="deleteEntry('trip','${t.id}')">✕</button>
+      <button class="del-x" onclick="event.stopPropagation(); deleteEntry('trip','${t.id}')">✕</button>
     </div>`).join('');
 }
 
@@ -677,11 +688,19 @@ async function saveFuel(){
   if(!amount || !quantity || !odometer){ showToast('Fill in amount, quantity and odometer'); return; }
   const row = { fuel_type: fuelTypeSel, amount, quantity, odometer, fill_date, is_backup,
     cycle_key: cycleKey(fill_date), week_key: weekKey(fill_date) };
-  const {error} = await sb.from('punch_fuel').insert(row);
+  let error;
+  if(editState.kind==='fuel' && editState.id){
+    ({error} = await sb.from('punch_fuel').update(row).eq('id', editState.id));
+  } else {
+    ({error} = await sb.from('punch_fuel').insert(row));
+  }
   if(error){ showToast('Error saving'); console.error(error); return; }
-  showToast('Fuel entry saved');
+  showToast(editState.id ? 'Fuel entry updated' : 'Fuel entry saved');
+  const wasEdit = !!editState.id;
+  cancelEdit();
   clearFuelForm();
   await loadAll();
+  if(wasEdit) goto('view-history');
 }
 async function saveService(){
   const amount = parseFloat(document.getElementById('s-amount').value);
@@ -689,11 +708,19 @@ async function saveService(){
   const expense_date = document.getElementById('s-date').value || todayStr();
   if(!amount){ showToast('Enter an amount'); return; }
   const row = { amount, note, expense_date, cycle_key: cycleKey(expense_date), week_key: weekKey(expense_date) };
-  const {error} = await sb.from('punch_service').insert(row);
+  let error;
+  if(editState.kind==='service' && editState.id){
+    ({error} = await sb.from('punch_service').update(row).eq('id', editState.id));
+  } else {
+    ({error} = await sb.from('punch_service').insert(row));
+  }
   if(error){ showToast('Error saving'); console.error(error); return; }
-  showToast('Service expense saved');
+  showToast(editState.id ? 'Service expense updated' : 'Service expense saved');
+  const wasEdit = !!editState.id;
+  cancelEdit();
   document.getElementById('s-amount').value=''; document.getElementById('s-note').value='';
   await loadAll();
+  if(wasEdit) goto('view-history');
 }
 async function saveDriver(){
   const amount = parseFloat(document.getElementById('d-amount').value);
@@ -701,11 +728,19 @@ async function saveDriver(){
   const expense_date = document.getElementById('d-date').value || todayStr();
   if(!amount){ showToast('Enter an amount'); return; }
   const row = { amount, note, expense_date, cycle_key: cycleKey(expense_date), week_key: weekKey(expense_date) };
-  const {error} = await sb.from('punch_driver').insert(row);
+  let error;
+  if(editState.kind==='driver' && editState.id){
+    ({error} = await sb.from('punch_driver').update(row).eq('id', editState.id));
+  } else {
+    ({error} = await sb.from('punch_driver').insert(row));
+  }
   if(error){ showToast('Error saving'); console.error(error); return; }
-  showToast('Driver expense saved');
+  showToast(editState.id ? 'Driver expense updated' : 'Driver expense saved');
+  const wasEdit = !!editState.id;
+  cancelEdit();
   document.getElementById('d-amount').value=''; document.getElementById('d-note').value='';
   await loadAll();
+  if(wasEdit) goto('view-history');
 }
 async function saveTrip(){
   const start_location = document.getElementById('t-start').value.trim();
@@ -714,9 +749,15 @@ async function saveTrip(){
   const trip_date = document.getElementById('t-date').value || todayStr();
   if(!start_location || !end_location){ showToast('Enter start and end location'); return; }
   const row = { start_location, end_location, note, trip_date };
-  const {error} = await sb.from('punch_trips').insert(row);
+  let error;
+  if(editState.kind==='trip' && editState.id){
+    ({error} = await sb.from('punch_trips').update(row).eq('id', editState.id));
+  } else {
+    ({error} = await sb.from('punch_trips').insert(row));
+  }
   if(error){ showToast('Error saving'); console.error(error); return; }
-  showToast('Trip logged');
+  showToast(editState.id ? 'Trip updated' : 'Trip logged');
+  cancelEdit();
   document.getElementById('t-start').value=''; document.getElementById('t-end').value=''; document.getElementById('t-note').value='';
   await loadAll();
 }
@@ -733,6 +774,71 @@ function clearFuelForm(){
   document.getElementById('f-qty').value='';
   document.getElementById('f-odo').value='';
   document.getElementById('f-backup').checked=false;
+}
+
+/* ================== EDIT FLOW ================== */
+function openEditEntry(kind, id){
+  editState = { kind, id };
+  goto('view-add');
+  setAddType(kind);
+  document.getElementById('editBanner').style.display = 'block';
+  document.getElementById('typeTabs').style.display = 'none';
+  document.getElementById('addTitle').textContent = 'Edit entry';
+  document.getElementById('addSub').textContent = 'Update the details below and save.';
+
+  if(kind==='fuel'){
+    const row = FUEL.find(x=>String(x.id)===String(id));
+    if(!row) return;
+    setFuelType(row.fuel_type);
+    document.getElementById('f-amount').value = row.amount;
+    document.getElementById('f-qty').value = row.quantity;
+    document.getElementById('f-odo').value = row.odometer;
+    document.getElementById('f-date').value = row.fill_date;
+    document.getElementById('f-backup').checked = !!row.is_backup;
+    document.querySelector('#fuelForm .save-btn').textContent = 'Update fuel entry';
+  } else if(kind==='service'){
+    const row = SERVICE.find(x=>String(x.id)===String(id));
+    if(!row) return;
+    document.getElementById('s-amount').value = row.amount;
+    document.getElementById('s-note').value = row.note || '';
+    document.getElementById('s-date').value = row.expense_date;
+    document.querySelector('#serviceForm .save-btn').textContent = 'Update service expense';
+  } else if(kind==='driver'){
+    const row = DRIVER.find(x=>String(x.id)===String(id));
+    if(!row) return;
+    document.getElementById('d-amount').value = row.amount;
+    document.getElementById('d-note').value = row.note || '';
+    document.getElementById('d-date').value = row.expense_date;
+    document.querySelector('#driverForm .save-btn').textContent = 'Update driver expense';
+  }
+}
+function openEditTrip(id){
+  goto('view-trips');
+  const row = TRIPS.find(x=>String(x.id)===String(id));
+  if(!row) return;
+  editState = { kind:'trip', id };
+  document.getElementById('t-start').value = row.start_location;
+  document.getElementById('t-end').value = row.end_location;
+  document.getElementById('t-note').value = row.note || '';
+  document.getElementById('t-date').value = row.trip_date;
+  document.querySelector('#view-trips .save-btn').textContent = 'Update trip';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function cancelEdit(){
+  editState = { kind:null, id:null };
+  document.getElementById('editBanner').style.display = 'none';
+  document.getElementById('typeTabs').style.display = 'flex';
+  document.getElementById('addTitle').textContent = 'Add entry';
+  document.getElementById('addSub').textContent = 'Log a fuel fill-up, service cost, or driver payment.';
+  document.querySelector('#fuelForm .save-btn').textContent = 'Save fuel entry';
+  document.querySelector('#serviceForm .save-btn').textContent = 'Save service expense';
+  document.querySelector('#driverForm .save-btn').textContent = 'Save driver expense';
+  document.querySelector('#view-trips .save-btn').textContent = 'Save trip';
+  clearFuelForm();
+  document.getElementById('s-amount').value=''; document.getElementById('s-note').value='';
+  document.getElementById('d-amount').value=''; document.getElementById('d-note').value='';
+  document.getElementById('t-start').value=''; document.getElementById('t-end').value=''; document.getElementById('t-note').value='';
+  ['f-date','s-date','d-date','t-date'].forEach(id=>{ document.getElementById(id).value = todayStr(); });
 }
 
 /* ================== UI WIRING ================== */
