@@ -201,6 +201,14 @@
   .fueltype-opt.sel-cng{background:linear-gradient(135deg,var(--fuel-a),var(--fuel-b));color:#fff;border-color:transparent;}
   .fueltype-opt.sel-petrol{background:linear-gradient(135deg,#F0A93F,#F7D774);color:#7A5A0C;border-color:transparent;}
 
+  .backup-field{background:#FBFAF5;border:1.5px dashed #E9C46A;border-radius:var(--radius-sm);padding:10px 12px;margin-top:2px;}
+  .backup-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;}
+  .backup-label input{width:auto;}
+  .backup-hint{font-size:11px;color:var(--ink-soft);margin-top:5px;line-height:1.4;}
+  .tag-backup{
+    display:inline-block;font-size:9.5px;font-weight:700;color:#8A6300;background:#FDE9B4;
+    border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:middle;
+  }
   .save-btn{
     width:100%;padding:14px;border:none;border-radius:var(--radius-sm);
     background:var(--ink);color:#fff;font-size:14.5px;font-weight:700;font-family:'Inter',sans-serif;
@@ -340,6 +348,10 @@
       <div class="field"><label id="f-qty-label">Quantity filled (kg)</label><input type="number" id="f-qty" inputmode="decimal" placeholder="e.g. 7.5"/></div>
       <div class="field"><label>Odometer reading (km)</label><input type="number" id="f-odo" inputmode="decimal" placeholder="e.g. 452"/></div>
       <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
+      <div class="field backup-field">
+        <label class="backup-label"><input type="checkbox" id="f-backup"/> Backup top-up (don't use to split mileage)</label>
+        <div class="backup-hint">Check this if you're just topping up petrol as a buffer while mostly running CNG — it'll still count toward your Petrol expense, but won't wrongly claim the km around it.</div>
+      </div>
       <button class="save-btn" onclick="saveFuel()">Save fuel entry</button>
     </div>
 
@@ -498,9 +510,12 @@ async function loadAll(){
    Segment cost = FUEL[i].amount, Segment qty = FUEL[i].quantity
 */
 function buildSegments(){
+  // Backup top-ups don't get to "claim" the stretch of km after them — they're
+  // excluded as segment-starters, so the real fuel type before/after just merges.
+  const attributors = FUEL.filter(x=>!x.is_backup);
   const segs = [];
-  for(let i=0;i<FUEL.length-1;i++){
-    const a = FUEL[i], b = FUEL[i+1];
+  for(let i=0;i<attributors.length-1;i++){
+    const a = attributors[i], b = attributors[i+1];
     const km = b.odometer - a.odometer;
     if(km <= 0) continue;
     segs.push({
@@ -601,7 +616,7 @@ function iconFor(kind){
 
 function allEntries(){
   const items = [];
-  FUEL.forEach(x=>items.push({kind:'fuel', date:x.fill_date, title:`${x.fuel_type} fill-up`, sub:`${x.quantity}${x.fuel_type==='CNG'?'kg':'L'} · odo ${x.odometer}km`, amount:x.amount, id:x.id}));
+  FUEL.forEach(x=>items.push({kind:'fuel', date:x.fill_date, title:`${x.fuel_type} fill-up${x.is_backup?' <span class="tag-backup">BACKUP</span>':''}`, sub:`${x.quantity}${x.fuel_type==='CNG'?'kg':'L'} · odo ${x.odometer}km`, amount:x.amount, id:x.id}));
   SERVICE.forEach(x=>items.push({kind:'service', date:x.expense_date, title:x.note || 'Service expense', sub:'Service & other', amount:x.amount, id:x.id}));
   DRIVER.forEach(x=>items.push({kind:'driver', date:x.expense_date, title:x.note || 'Driver expense', sub:'Driver', amount:x.amount, id:x.id}));
   items.sort((a,b)=> b.date.localeCompare(a.date));
@@ -658,8 +673,9 @@ async function saveFuel(){
   const quantity = parseFloat(document.getElementById('f-qty').value);
   const odometer = parseFloat(document.getElementById('f-odo').value);
   const fill_date = document.getElementById('f-date').value || todayStr();
+  const is_backup = document.getElementById('f-backup').checked;
   if(!amount || !quantity || !odometer){ showToast('Fill in amount, quantity and odometer'); return; }
-  const row = { fuel_type: fuelTypeSel, amount, quantity, odometer, fill_date,
+  const row = { fuel_type: fuelTypeSel, amount, quantity, odometer, fill_date, is_backup,
     cycle_key: cycleKey(fill_date), week_key: weekKey(fill_date) };
   const {error} = await sb.from('punch_fuel').insert(row);
   if(error){ showToast('Error saving'); console.error(error); return; }
@@ -716,6 +732,7 @@ function clearFuelForm(){
   document.getElementById('f-amount').value='';
   document.getElementById('f-qty').value='';
   document.getElementById('f-odo').value='';
+  document.getElementById('f-backup').checked=false;
 }
 
 /* ================== UI WIRING ================== */
