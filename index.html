@@ -1164,7 +1164,7 @@ function renderCharts(){
   renderBarChart('chartCycles', buildCycleSeries(6), '#7C6FF0', '#B9AEFF', v=>'₹'+Math.round(v));
   const wk = buildWeeklySeries(8);
   renderBarChart('chartWeeklyExpense', wk.map(x=>({label:x.label, value:x.expense})), '#FF7A59', '#FFB347', v=>'₹'+Math.round(v));
-  renderBarChart('chartWeeklyDistance', wk.map(x=>({label:x.label, value:x.distance})), '#34C77B', '#A8E890', v=>Math.round(v)+'k');
+  renderBarChart('chartWeeklyDistance', wk.map(x=>({label:x.label, value:x.distance})), '#34C77B', '#A8E890', v=>Math.round(v)+' km');
 }
 function setPastTab(tab){
   document.getElementById('subtab-list').classList.toggle('active-fuel', tab==='list');
