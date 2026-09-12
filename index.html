@@ -106,6 +106,11 @@
   .trend.up{color:#FFB4A8;}
   .trend.down{color:#9BFFC9;}
   .trend.flat{color:rgba(255,255,255,.6);}
+  .chart-card{
+    margin:14px 20px 0; background:#fff; border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:14px 14px 6px;
+  }
+  .chart-title{font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:4px;}
   .split-bar{
     display:flex;height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.12);position:relative;
   }
@@ -292,7 +297,7 @@
       <div class="chip" data-period="all">All time</div>
     </div>
     <div class="past-link-row" id="pastLinkRow">
-      <a onclick="goto('view-pastcycles')">📅 See past cycles</a>
+      <a onclick="goto('view-pastcycles')">📊 Past cycles &amp; trends</a>
     </div>
 
     <div class="hero">
@@ -460,9 +465,29 @@
 
   <!-- ============ PAST CYCLES ============ -->
   <div class="view" id="view-pastcycles">
-    <h2 class="page-title">Past cycles</h2>
-    <p class="page-sub">Tap any month to jump into it.</p>
-    <div class="entry-list" id="pastCyclesList" style="padding-bottom:16px;"></div>
+    <h2 class="page-title">Past cycles &amp; trends</h2>
+    <p class="page-sub">Tap a month to jump in, or switch to charts.</p>
+    <div class="type-tabs">
+      <div class="type-tab active-fuel" id="subtab-list" data-sub="list" onclick="setPastTab('list')">📋 List</div>
+      <div class="type-tab" id="subtab-charts" data-sub="charts" onclick="setPastTab('charts')">📈 Charts</div>
+    </div>
+    <div id="pastListWrap">
+      <div class="entry-list" id="pastCyclesList" style="padding-top:14px; padding-bottom:16px;"></div>
+    </div>
+    <div id="pastChartsWrap" style="display:none;">
+      <div class="chart-card">
+        <div class="chart-title">Cycle totals · last 6 months</div>
+        <div id="chartCycles"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Weekly expense · last 8 weeks</div>
+        <div id="chartWeeklyExpense"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Weekly distance · last 8 weeks</div>
+        <div id="chartWeeklyDistance"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ============ NAV ============ -->
@@ -645,6 +670,20 @@ function buildSegments(){
 }
 
 /* ================== AGGREGATION ================== */
+function segmentStatsForRange(range){
+  const allSegs = buildSegments();
+  let totalKm=0, cngKm=0, cngQty=0, segFuelCost=0, segCount=0;
+  allSegs.forEach(s=>{
+    const frac = segmentOverlapFraction(s.startDate, s.attribDate, range);
+    if(frac<=0) return;
+    segCount++;
+    const km = s.km*frac;
+    totalKm += km;
+    segFuelCost += Number(s.cost)*frac;
+    if(s.type==='CNG'){ cngKm += km; cngQty += Number(s.qty)*frac; }
+  });
+  return { totalKm, cngKm, cngQty, segFuelCost, segCount };
+}
 function expenseTotalsForPredicate(pred){
   const fuelIn = FUEL.filter(x=>pred(x.fill_date));
   const serviceIn = SERVICE.filter(x=>pred(x.expense_date));
@@ -675,24 +714,14 @@ function computeStats(){
   // Distance/mileage: prorate each fill-to-fill segment across the days it actually
   // spans, so a big gap that closes today doesn't get dumped entirely on today's week.
   const range = periodRange();
-  const allSegs = buildSegments();
-  let totalKm=0, cngKm=0, cngQty=0, segFuelCost=0, segCount=0;
-  allSegs.forEach(s=>{
-    const frac = segmentOverlapFraction(s.startDate, s.attribDate, range);
-    if(frac<=0) return;
-    segCount++;
-    const km = s.km*frac;
-    totalKm += km;
-    segFuelCost += Number(s.cost)*frac;
-    if(s.type==='CNG'){ cngKm += km; cngQty += Number(s.qty)*frac; }
-  });
+  const { totalKm, cngKm, cngQty, segFuelCost, segCount } = segmentStatsForRange(range);
   const cngAvg = cngQty > 0 ? (cngKm / cngQty) : null;
   const costPerKm = totalKm > 0 ? (segFuelCost / totalKm) : null;
 
   // Best / last fill average — always all-time, not period-filtered, so a standout
   // trip (or your latest tank) shows up regardless of which period chip is selected.
   let best = null, last = null;
-  allSegs.forEach(s=>{
+  buildSegments().forEach(s=>{
     const avg = Number(s.qty) > 0 ? s.km / Number(s.qty) : null;
     if(avg==null) return;
     const rec = { avg, type:s.type, location:s.location, date:s.attribDate };
@@ -1075,6 +1104,74 @@ function stepPeriod(dir){
     weekOffset = next;
   }
   render();
+}
+function cycleShortLabel(key){
+  const [y,m] = key.split('-').map(Number);
+  return new Date(y, m-1, 10).toLocaleDateString('en-GB',{month:'short'});
+}
+function weekShortLabel(key){
+  return toDate(key).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+function weekRangeForKey(key){
+  const start = toDate(key);
+  const end = new Date(start); end.setDate(end.getDate()+6);
+  return { start, end };
+}
+function buildCycleSeries(n){
+  const arr = [];
+  for(let off=-(n-1); off<=0; off++){
+    const key = cycleKeyWithOffset(off);
+    const tot = expenseTotalsForPredicate(d=>cycleKey(d)===key);
+    arr.push({ label: cycleShortLabel(key), value: tot.grandTotal });
+  }
+  return arr;
+}
+function buildWeeklySeries(n){
+  const arr = [];
+  for(let off=-(n-1); off<=0; off++){
+    const key = weekKeyWithOffset(off);
+    const tot = expenseTotalsForPredicate(d=>weekKey(d)===key);
+    const dist = segmentStatsForRange(weekRangeForKey(key)).totalKm;
+    arr.push({ label: weekShortLabel(key), expense: tot.grandTotal, distance: dist });
+  }
+  return arr;
+}
+function renderBarChart(elId, items, colorA, colorB, valueFmt){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const w = 320, h = 140, padBottom = 22, padTop = 18, gap = 8;
+  const maxVal = Math.max(...items.map(i=>i.value), 1);
+  const barW = (w - gap*(items.length+1)) / items.length;
+  let bars = '';
+  items.forEach((it,idx)=>{
+    const barH = maxVal>0 ? (it.value/maxVal)*(h-padTop-padBottom) : 0;
+    const x = gap + idx*(barW+gap);
+    const y = h - padBottom - barH;
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH,2).toFixed(1)}" rx="5" fill="url(#g-${elId})"></rect>`;
+    bars += `<text x="${(x+barW/2).toFixed(1)}" y="${h-padBottom+13}" font-size="8.5" fill="#9B98AC" text-anchor="middle" font-family="Inter,sans-serif">${it.label}</text>`;
+    if(it.value>0){
+      bars += `<text x="${(x+barW/2).toFixed(1)}" y="${(y-4).toFixed(1)}" font-size="8.5" font-weight="700" fill="#1C1B29" text-anchor="middle" font-family="Inter,sans-serif">${valueFmt(it.value)}</text>`;
+    }
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="xMidYMid meet">
+    <defs><linearGradient id="g-${elId}" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="${colorA}"/><stop offset="100%" stop-color="${colorB}"/>
+    </linearGradient></defs>
+    ${bars}
+  </svg>`;
+}
+function renderCharts(){
+  renderBarChart('chartCycles', buildCycleSeries(6), '#7C6FF0', '#B9AEFF', v=>'₹'+Math.round(v));
+  const wk = buildWeeklySeries(8);
+  renderBarChart('chartWeeklyExpense', wk.map(x=>({label:x.label, value:x.expense})), '#FF7A59', '#FFB347', v=>'₹'+Math.round(v));
+  renderBarChart('chartWeeklyDistance', wk.map(x=>({label:x.label, value:x.distance})), '#34C77B', '#A8E890', v=>Math.round(v)+'k');
+}
+function setPastTab(tab){
+  document.getElementById('subtab-list').classList.toggle('active-fuel', tab==='list');
+  document.getElementById('subtab-charts').classList.toggle('active-fuel', tab==='charts');
+  document.getElementById('pastListWrap').style.display = tab==='list' ? 'block' : 'none';
+  document.getElementById('pastChartsWrap').style.display = tab==='charts' ? 'block' : 'none';
+  if(tab==='charts') renderCharts();
 }
 function jumpToCycle(key){
   period = 'cycle';
