@@ -11,13 +11,13 @@
     --ink:#1C1B29;
     --ink-soft:#726F8C;
     --bg:#F7F7FB;
-    --card-bg:#FFFFFF;
     --line:#ECEAF4;
 
-    --fuel-a:#FF7A59; --fuel-b:#FFB347; --fuel-text:#7A2E12;
-    --driver-a:#7C6FF0; --driver-b:#B9AEFF; --driver-text:#2E2481;
-    --service-a:#2FB8C6; --service-b:#8EE9E0; --service-text:#0A4A50;
-    --dist-a:#34C77B; --dist-b:#A8E890; --dist-text:#0F5A2E;
+    --fuel-a:#FF7A59; --fuel-b:#FFB347;
+    --driver-a:#7C6FF0; --driver-b:#B9AEFF;
+    --service-a:#2FB8C6; --service-b:#8EE9E0;
+    --emi-a:#3E6BFF; --emi-b:#9FC1FF;
+    --dist-a:#34C77B; --dist-b:#A8E890;
 
     --radius-lg:22px;
     --radius-md:16px;
@@ -31,7 +31,6 @@
     color:var(--ink);
     -webkit-font-smoothing:antialiased;
   }
-  .display{font-family:'Fredoka',sans-serif;}
   #app{
     max-width:480px;
     margin:0 auto;
@@ -42,128 +41,99 @@
   }
 
   /* ---------- Header ---------- */
-  .topbar{
-    padding:22px 20px 8px;
-  }
+  .topbar{ padding:22px 20px 8px; display:flex; align-items:center; justify-content:space-between; }
   .topbar .greet{font-size:13px;color:var(--ink-soft);font-weight:500;}
   .topbar h1{font-family:'Fredoka',sans-serif;font-size:26px;font-weight:600;margin:2px 0 0;}
+  .back-btn{
+    background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;
+    font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer;
+  }
 
   /* ---------- Period chips ---------- */
-  .period-row{
-    display:flex;gap:8px;padding:14px 20px 4px;
-  }
+  .period-row{ display:flex;gap:8px;padding:14px 20px 4px; }
   .chip{
-    font-family:'Inter',sans-serif;
-    font-size:13px;font-weight:600;
-    padding:8px 14px;border-radius:999px;
-    border:1.5px solid var(--line);
-    background:#fff;color:var(--ink-soft);
-    cursor:pointer;
+    font-family:'Inter',sans-serif; font-size:13px;font-weight:600;
+    padding:8px 14px;border-radius:999px; border:1.5px solid var(--line);
+    background:#fff;color:var(--ink-soft); cursor:pointer;
     transition:background .15s ease, color .15s ease, border-color .15s ease;
   }
-  .chip.active{
-    background:var(--ink);border-color:var(--ink);color:#fff;
-  }
+  .chip.active{ background:var(--ink);border-color:var(--ink);color:#fff; }
 
-  /* ---------- Hero card ---------- */
+  /* ---------- Hero card (tappable -> trends) ---------- */
   .hero{
-    margin:14px 20px 0;
-    background:var(--ink);
-    border-radius:var(--radius-lg);
-    padding:22px 22px 20px;
-    color:#fff;
-    position:relative;
-    overflow:hidden;
+    margin:14px 20px 0; background:var(--ink); border-radius:var(--radius-lg);
+    padding:22px 22px 18px; color:#fff; position:relative; overflow:hidden; cursor:pointer;
   }
   .hero::after{
-    content:"";
-    position:absolute; right:-40px; top:-50px;
-    width:170px;height:170px;border-radius:50%;
+    content:""; position:absolute; right:-40px; top:-50px; width:170px;height:170px;border-radius:50%;
     background:radial-gradient(circle at 30% 30%, rgba(255,122,89,.55), rgba(124,111,240,.25) 60%, transparent 70%);
   }
+  .hero-nav{ display:flex; align-items:center; justify-content:center; gap:10px; position:relative; }
   .hero .label{font-size:12.5px;color:rgba(255,255,255,.65);font-weight:500;position:relative;}
-  .hero .amount{font-family:'Fredoka',sans-serif;font-size:38px;font-weight:600;margin:2px 0 14px;position:relative;}
-  .hero .amount span{font-size:20px;font-weight:500;opacity:.7;}
-  .past-link-row{
-    padding:6px 20px 0; text-align:right;
-  }
-  .past-link-row a{
-    font-size:12px; font-weight:600; color:var(--ink-soft); text-decoration:none; cursor:pointer;
-  }
-  .hero-nav{
-    display:flex; align-items:center; justify-content:center; gap:10px; position:relative;
-  }
   .hero-arrow{
     background:rgba(255,255,255,.12); border:none; color:#fff; width:26px;height:26px;border-radius:50%;
-    font-size:15px; cursor:pointer; display:flex;align-items:center;justify-content:center; flex-shrink:0;
-    position:relative;
+    font-size:15px; cursor:pointer; display:flex;align-items:center;justify-content:center; flex-shrink:0; position:relative;
   }
   .hero-arrow:disabled{opacity:.25; cursor:default;}
   .hero-arrow.hidden{visibility:hidden;}
-  .trend{
-    font-size:11.5px; font-weight:600; margin:-8px 0 10px; position:relative;
-  }
-  .trend.up{color:#FFB4A8;}
-  .trend.down{color:#9BFFC9;}
-  .trend.flat{color:rgba(255,255,255,.6);}
-  .chart-card{
-    margin:14px 20px 0; background:#fff; border:1px solid var(--line); border-radius:var(--radius-md);
-    padding:14px 14px 6px;
-  }
-  .chart-title{font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:4px;}
-  .split-bar{
-    display:flex;height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.12);position:relative;
-  }
+  .hero .amount{font-family:'Fredoka',sans-serif;font-size:38px;font-weight:600;margin:2px 0 4px;position:relative;}
+  .trend{ font-size:11.5px; font-weight:600; margin:0 0 12px; position:relative; }
+  .trend.up{color:#FFB4A8;} .trend.down{color:#9BFFC9;} .trend.flat{color:rgba(255,255,255,.6);}
+  .split-bar{ display:flex;height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.12);position:relative; }
   .split-bar div{height:100%;}
-  .split-legend{
-    display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;position:relative;
-  }
-  .split-legend span{
-    font-size:11.5px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:5px;font-weight:500;
-  }
+  .split-legend{ display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;position:relative; }
+  .split-legend span{ font-size:11px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:5px;font-weight:500; }
   .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .hero-hint{
+    font-size:10.5px; color:rgba(255,255,255,.5); margin-top:12px; position:relative; font-weight:500;
+  }
 
-  /* ---------- Stat grid ---------- */
-  .grid{
-    display:grid;grid-template-columns:1fr 1fr;gap:12px;
-    padding:16px 20px 4px;
+  /* ---------- Category rows (minimal home summary) ---------- */
+  .cat-rows{ padding:16px 20px 4px; display:flex; flex-direction:column; gap:10px; }
+  .cat-row{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:13px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;
   }
+  .cat-ico{
+    width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:18px;color:#fff;flex-shrink:0;
+  }
+  .cat-meta{flex:1;min-width:0;}
+  .cat-title{font-size:14px;font-weight:700;color:var(--ink);}
+  .cat-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .cat-amt{font-family:'Fredoka',sans-serif;font-size:16.5px;font-weight:600;color:var(--ink);white-space:nowrap;}
+  .cat-chevron{color:var(--ink-soft);font-size:17px;margin-left:2px;}
+
+  /* ---------- Mini stat grid (used in category detail only) ---------- */
+  .grid{ display:grid;grid-template-columns:1fr 1fr;gap:12px; padding:4px 20px 4px; }
   .stat-card{
-    border-radius:var(--radius-md);
-    padding:16px 15px;
-    position:relative;
-    overflow:hidden;
-    color:#fff;
-    min-height:108px;
-    display:flex;flex-direction:column;justify-content:space-between;
+    border-radius:var(--radius-md); padding:15px 14px; position:relative; overflow:hidden;
+    color:#fff; min-height:96px; display:flex;flex-direction:column;justify-content:space-between;
   }
-  .stat-card .icon{font-size:19px;}
-  .stat-card .stitle{font-size:12px;font-weight:600;opacity:.92;margin-top:8px;}
-  .stat-card .sval{font-family:'Fredoka',sans-serif;font-size:21px;font-weight:600;margin-top:2px;}
-  .stat-card .ssub{font-size:10.5px;opacity:.85;margin-top:3px;font-weight:500;}
+  .stat-card .icon{font-size:18px;}
+  .stat-card .stitle{font-size:11.5px;font-weight:600;opacity:.92;margin-top:6px;}
+  .stat-card .sval{font-family:'Fredoka',sans-serif;font-size:19px;font-weight:600;margin-top:2px;}
+  .stat-card .ssub{font-size:10px;opacity:.85;margin-top:3px;font-weight:500;}
   .c-fuel{background:linear-gradient(135deg,var(--fuel-a),var(--fuel-b));}
   .c-driver{background:linear-gradient(135deg,var(--driver-a),var(--driver-b));}
   .c-service{background:linear-gradient(135deg,var(--service-a),var(--service-b));}
+  .c-emi{background:linear-gradient(135deg,var(--emi-a),var(--emi-b));}
   .c-dist{background:linear-gradient(135deg,var(--dist-a),var(--dist-b));}
   .c-flat{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
   .c-flat .stitle{color:var(--ink-soft);opacity:1;}
   .c-flat .ssub{color:var(--ink-soft);opacity:1;}
   .c-best{background:linear-gradient(135deg,#F5C242,#FFE29A);color:#5C4300;}
-  .c-best .stitle{opacity:.9;}
-  .c-best .ssub{opacity:.85;}
+  .c-best .stitle{opacity:.9;} .c-best .ssub{opacity:.85;}
 
   /* ---------- Section ---------- */
-  .section-head{
-    display:flex;justify-content:space-between;align-items:baseline;
-    padding:20px 20px 6px;
-  }
+  .section-head{ display:flex;justify-content:space-between;align-items:baseline; padding:20px 20px 6px; }
   .section-head h2{font-family:'Fredoka',sans-serif;font-size:17px;font-weight:600;margin:0;}
-  .section-head a{font-size:12.5px;color:var(--ink-soft);font-weight:600;text-decoration:none;}
+  .section-head a{font-size:12.5px;color:var(--ink-soft);font-weight:600;text-decoration:none;cursor:pointer;}
 
   .entry-list{padding:0 20px;display:flex;flex-direction:column;gap:8px;}
   .entry{
     background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm);
-    padding:12px 14px;display:flex;align-items:center;gap:12px;
+    padding:12px 14px;display:flex;align-items:center;gap:12px; cursor:pointer;
   }
   .entry .ico{
     width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
@@ -173,23 +143,22 @@
   .entry .meta .t1{font-size:13.5px;font-weight:600;color:var(--ink);}
   .entry .meta .t2{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
   .entry .amt{font-size:14px;font-weight:700;font-family:'Fredoka',sans-serif;white-space:nowrap;}
-  .empty-note{
-    padding:22px 20px;text-align:center;color:var(--ink-soft);font-size:13px;
+  .empty-note{ padding:22px 20px;text-align:center;color:var(--ink-soft);font-size:13px; }
+  .tag-backup{
+    display:inline-block;font-size:9.5px;font-weight:700;color:#8A6300;background:#FDE9B4;
+    border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:middle;
   }
+  .del-x{ background:none;border:none;color:var(--ink-soft);font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0; }
 
   /* ---------- Bottom nav ---------- */
   .navbar{
     position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-    width:100%;max-width:480px;
-    background:#fff;border-top:1px solid var(--line);
-    display:flex;justify-content:space-around;align-items:center;
-    padding:10px 6px 14px;
-    z-index:50;
+    width:100%;max-width:480px; background:#fff;border-top:1px solid var(--line);
+    display:flex;justify-content:space-around;align-items:center; padding:10px 6px 14px; z-index:50;
   }
   .navbtn{
     background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
-    color:var(--ink-soft);font-size:10.5px;font-weight:600;font-family:'Inter',sans-serif;
-    cursor:pointer;padding:4px 10px;
+    color:var(--ink-soft);font-size:10.5px;font-weight:600;font-family:'Inter',sans-serif; cursor:pointer;padding:4px 14px;
   }
   .navbtn .nicon{font-size:19px;}
   .navbtn.active{color:var(--ink);}
@@ -199,18 +168,18 @@
   }
 
   /* ---------- Views ---------- */
-  .view{display:none;}
-  .view.active{display:block;}
+  .view{display:none;} .view.active{display:block;}
 
   /* ---------- Forms (Add view) ---------- */
-  .type-tabs{display:flex;gap:8px;padding:16px 20px 4px;}
+  .type-tabs{display:flex;gap:7px;padding:16px 20px 4px;}
   .type-tab{
-    flex:1;text-align:center;padding:11px 6px;border-radius:var(--radius-sm);
-    font-size:12.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);
+    flex:1;text-align:center;padding:10px 4px;border-radius:var(--radius-sm);
+    font-size:11.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);
   }
   .type-tab.active-fuel{background:linear-gradient(135deg,var(--fuel-a),var(--fuel-b));color:#fff;border-color:transparent;}
   .type-tab.active-driver{background:linear-gradient(135deg,var(--driver-a),var(--driver-b));color:#fff;border-color:transparent;}
   .type-tab.active-service{background:linear-gradient(135deg,var(--service-a),var(--service-b));color:#fff;border-color:transparent;}
+  .type-tab.active-emi{background:linear-gradient(135deg,var(--emi-a),var(--emi-b));color:#fff;border-color:transparent;}
 
   .form-card{
     margin:14px 20px 0;background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);
@@ -235,17 +204,7 @@
   .backup-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;}
   .backup-label input{width:auto;}
   .backup-hint{font-size:11px;color:var(--ink-soft);margin-top:5px;line-height:1.4;}
-  .tag-backup{
-    display:inline-block;font-size:9.5px;font-weight:700;color:#8A6300;background:#FDE9B4;
-    border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:middle;
-  }
-  .edit-banner{
-    margin:14px 20px 0;background:#EFEBFF;color:#4B3FBF;font-size:12.5px;font-weight:600;
-    padding:10px 14px;border-radius:var(--radius-sm);
-  }
-  .edit-banner a{color:#4B3FBF;text-decoration:underline;cursor:pointer;}
-  .entry{cursor:pointer;}
-  .trip-card{cursor:pointer;}
+
   .save-btn{
     width:100%;padding:14px;border:none;border-radius:var(--radius-sm);
     background:var(--ink);color:#fff;font-size:14.5px;font-weight:700;font-family:'Inter',sans-serif;
@@ -255,26 +214,35 @@
   .toast{
     position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;
-    opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;
-    z-index:100;
+    opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease; z-index:100;
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
 
-  /* History view */
-  .hist-filters{display:flex;gap:8px;padding:16px 20px 4px;flex-wrap:wrap;}
-  .hist-list{padding:10px 20px 20px;display:flex;flex-direction:column;gap:8px;}
-  .del-x{
-    background:none;border:none;color:var(--ink-soft);font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0;
+  .edit-banner{
+    margin:14px 20px 0;background:#EFEBFF;color:#4B3FBF;font-size:12.5px;font-weight:600;
+    padding:10px 14px;border-radius:var(--radius-sm);
   }
+  .edit-banner a{color:#4B3FBF;text-decoration:underline;cursor:pointer;}
 
-  /* Trips view */
-  .trip-card{
-    background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;
-    display:flex;align-items:center;gap:10px;
+  /* History view */
+  .hist-filters{display:flex;gap:7px;padding:16px 20px 4px;flex-wrap:wrap;}
+  .hist-list{padding:10px 20px 20px;display:flex;flex-direction:column;gap:8px;}
+
+  /* Category detail view */
+  .cat-header{ display:flex; align-items:center; gap:12px; padding:20px 20px 4px; }
+  .cat-header .cat-ico-lg{
+    width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:#fff;flex-shrink:0;
   }
-  .trip-route{font-size:13.5px;font-weight:600;}
-  .trip-route .arrow{color:var(--ink-soft);margin:0 4px;}
-  .trip-date{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .cat-header h2{font-family:'Fredoka',sans-serif;font-size:20px;font-weight:600;margin:0;}
+  .cat-header .cat-period{font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  .cat-total-row{ padding:14px 20px 2px; }
+  .cat-total-row .amt{font-family:'Fredoka',sans-serif;font-size:30px;font-weight:600;color:var(--ink);}
+  .cat-total-row .lbl{font-size:12px;color:var(--ink-soft);font-weight:600;}
+
+  /* Past cycles & trends */
+  .chart-card{ margin:14px 20px 0; background:#fff; border:1px solid var(--line); border-radius:var(--radius-md); padding:14px 14px 6px; }
+  .chart-title{font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:4px;}
 
   h2.page-title{font-family:'Fredoka',sans-serif;font-size:20px;font-weight:600;margin:20px 20px 2px;}
   p.page-sub{font-size:12.5px;color:var(--ink-soft);margin:0 20px 4px;}
@@ -287,8 +255,10 @@
   <!-- ============ HOME ============ -->
   <div class="view active" id="view-home">
     <div class="topbar">
-      <div class="greet">Hi Malani 👋</div>
-      <h1>Punch Tracker</h1>
+      <div>
+        <div class="greet">Hi Malani 👋</div>
+        <h1>Punch Tracker</h1>
+      </div>
     </div>
 
     <div class="period-row">
@@ -296,88 +266,21 @@
       <div class="chip" data-period="week">This week</div>
       <div class="chip" data-period="all">All time</div>
     </div>
-    <div class="past-link-row" id="pastLinkRow">
-      <a onclick="goto('view-pastcycles')">📊 Past cycles &amp; trends</a>
-    </div>
 
-    <div class="hero">
+    <div class="hero" id="heroCard" onclick="goto('view-pastcycles')">
       <div class="hero-nav">
-        <button class="hero-arrow" id="arrowPrev" onclick="stepPeriod(-1)">‹</button>
+        <button class="hero-arrow" id="arrowPrev" onclick="event.stopPropagation(); stepPeriod(-1)">‹</button>
         <div class="label" id="periodLabel">Cycle · 10 Sep – 9 Oct</div>
-        <button class="hero-arrow" id="arrowNext" onclick="stepPeriod(1)">›</button>
+        <button class="hero-arrow" id="arrowNext" onclick="event.stopPropagation(); stepPeriod(1)">›</button>
       </div>
       <div class="amount" id="heroTotal">₹0</div>
       <div class="trend" id="trendLine"></div>
       <div class="split-bar" id="splitBar"></div>
       <div class="split-legend" id="splitLegend"></div>
+      <div class="hero-hint">Tap to see past cycles &amp; trends ›</div>
     </div>
 
-    <div class="grid">
-      <div class="stat-card c-fuel">
-        <div class="icon">⛽</div>
-        <div>
-          <div class="stitle">Fuel</div>
-          <div class="sval" id="statFuel">₹0</div>
-          <div class="ssub" id="statFuelSplit">CNG ₹0 · Petrol ₹0</div>
-        </div>
-      </div>
-      <div class="stat-card c-driver">
-        <div class="icon">🧑‍✈️</div>
-        <div>
-          <div class="stitle">Driver</div>
-          <div class="sval" id="statDriver">₹0</div>
-          <div class="ssub">&nbsp;</div>
-        </div>
-      </div>
-      <div class="stat-card c-service">
-        <div class="icon">🧰</div>
-        <div>
-          <div class="stitle">Service &amp; other</div>
-          <div class="sval" id="statService">₹0</div>
-          <div class="ssub">&nbsp;</div>
-        </div>
-      </div>
-      <div class="stat-card c-dist">
-        <div class="icon">🛣️</div>
-        <div>
-          <div class="stitle">Distance</div>
-          <div class="sval" id="statKm">0 km</div>
-          <div class="ssub" id="statKmSub">from odometer</div>
-        </div>
-      </div>
-      <div class="stat-card c-flat">
-        <div class="icon">🔥</div>
-        <div>
-          <div class="stitle">CNG average</div>
-          <div class="sval" id="statCngAvg">–</div>
-          <div class="ssub">km per kg</div>
-        </div>
-      </div>
-      <div class="stat-card c-flat">
-        <div class="icon">📉</div>
-        <div>
-          <div class="stitle">Cost per km</div>
-          <div class="sval" id="statCostPerKm">–</div>
-          <div class="ssub" id="statCostPerKmSub">overall</div>
-        </div>
-      </div>
-      <div class="stat-card c-best">
-        <div class="icon">🏆</div>
-        <div>
-          <div class="stitle">Best average</div>
-          <div class="sval" id="statBestAvg">–</div>
-          <div class="ssub" id="statBestAvgSub">all time</div>
-        </div>
-      </div>
-      <div class="stat-card c-flat">
-        <div class="icon">🕓</div>
-        <div>
-          <div class="stitle">Last fill average</div>
-          <div class="sval" id="statLastAvg">–</div>
-          <div class="ssub" id="statLastAvgSub">most recent tank</div>
-        </div>
-      </div>
-    </div>
+    <div class="cat-rows" id="catRows"></div>
 
     <div class="section-head">
       <h2>Recent entries</h2>
@@ -387,10 +290,31 @@
     <div style="height:10px;"></div>
   </div>
 
+  <!-- ============ CATEGORY DETAIL ============ -->
+  <div class="view" id="view-category">
+    <div class="cat-header">
+      <button class="back-btn" onclick="goto('view-home')">‹ Back</button>
+    </div>
+    <div class="cat-header" style="padding-top:6px;">
+      <div class="cat-ico-lg" id="catDetailIco"></div>
+      <div>
+        <h2 id="catDetailTitle">Fuel</h2>
+        <div class="cat-period" id="catDetailPeriod">This cycle</div>
+      </div>
+    </div>
+    <div class="cat-total-row">
+      <div class="amt" id="catDetailAmt">₹0</div>
+      <div class="lbl" id="catDetailSub"></div>
+    </div>
+    <div class="grid" id="catExtraStats" style="display:none;"></div>
+    <div class="section-head"><h2>Entries</h2></div>
+    <div class="entry-list" id="catEntryList" style="padding-bottom:16px;"></div>
+  </div>
+
   <!-- ============ ADD ============ -->
   <div class="view" id="view-add">
     <h2 class="page-title" id="addTitle">Add entry</h2>
-    <p class="page-sub" id="addSub">Log a fuel fill-up, service cost, or driver payment.</p>
+    <p class="page-sub" id="addSub">Log a fuel fill-up, service cost, driver payment, or EMI.</p>
     <div class="edit-banner" id="editBanner" style="display:none;">
       Editing this entry — <a onclick="cancelEdit()">cancel</a>
     </div>
@@ -398,6 +322,7 @@
       <div class="type-tab active-fuel" data-type="fuel" onclick="setAddType('fuel')">⛽ Fuel</div>
       <div class="type-tab" data-type="service" onclick="setAddType('service')">🧰 Service</div>
       <div class="type-tab" data-type="driver" onclick="setAddType('driver')">🧑‍✈️ Driver</div>
+      <div class="type-tab" data-type="emi" onclick="setAddType('emi')">🏦 EMI</div>
     </div>
 
     <div class="form-card" id="fuelForm">
@@ -433,6 +358,13 @@
       <div class="field"><label>Date</label><input type="date" id="d-date"/></div>
       <button class="save-btn" onclick="saveDriver()">Save driver expense</button>
     </div>
+
+    <div class="form-card" id="emiForm" style="display:none;">
+      <div class="field"><label>Amount (₹)</label><input type="number" id="e-amount" inputmode="decimal" placeholder="e.g. 12500"/></div>
+      <div class="field"><label>Note (optional)</label><input type="text" id="e-note" placeholder="e.g. Sept EMI"/></div>
+      <div class="field"><label>Date</label><input type="date" id="e-date"/></div>
+      <button class="save-btn" onclick="saveEmi()">Save EMI payment</button>
+    </div>
   </div>
 
   <!-- ============ HISTORY ============ -->
@@ -444,28 +376,15 @@
       <div class="chip" data-hist="fuel">Fuel</div>
       <div class="chip" data-hist="service">Service</div>
       <div class="chip" data-hist="driver">Driver</div>
+      <div class="chip" data-hist="emi">EMI</div>
     </div>
     <div class="hist-list" id="histList"></div>
   </div>
 
-  <!-- ============ TRIPS ============ -->
-  <div class="view" id="view-trips">
-    <h2 class="page-title">Trips</h2>
-    <p class="page-sub">Just a log of where you drove — not used in any calculation.</p>
-    <div class="form-card">
-      <div class="field"><label>Start location</label><input type="text" id="t-start" placeholder="e.g. Mira Road"/></div>
-      <div class="field"><label>End location</label><input type="text" id="t-end" placeholder="e.g. Borivali"/></div>
-      <div class="field"><label>Note (optional)</label><input type="text" id="t-note" placeholder="e.g. Client shoot"/></div>
-      <div class="field"><label>Date</label><input type="date" id="t-date"/></div>
-      <button class="save-btn" onclick="saveTrip()">Save trip</button>
-    </div>
-    <div class="section-head"><h2>Recent trips</h2></div>
-    <div class="entry-list" id="tripList" style="padding-bottom:10px;"></div>
-  </div>
-
-  <!-- ============ PAST CYCLES ============ -->
+  <!-- ============ PAST CYCLES & TRENDS ============ -->
   <div class="view" id="view-pastcycles">
-    <h2 class="page-title">Past cycles &amp; trends</h2>
+    <div class="cat-header"><button class="back-btn" onclick="goto('view-home')">‹ Back</button></div>
+    <h2 class="page-title" style="margin-top:8px;">Past cycles &amp; trends</h2>
     <p class="page-sub">Tap a month to jump in, or switch to charts.</p>
     <div class="type-tabs">
       <div class="type-tab active-fuel" id="subtab-list" data-sub="list" onclick="setPastTab('list')">📋 List</div>
@@ -495,14 +414,11 @@
     <button class="navbtn active" data-view="view-home" onclick="goto('view-home')">
       <div class="nicon">🏠</div>Home
     </button>
-    <button class="navbtn" data-view="view-history" onclick="goto('view-history')">
-      <div class="nicon">📋</div>History
-    </button>
     <button class="navbtn addbtn" data-view="view-add" onclick="goto('view-add')">
       <div class="nicon">+</div>Add
     </button>
-    <button class="navbtn" data-view="view-trips" onclick="goto('view-trips')">
-      <div class="nicon">🧭</div>Trips
+    <button class="navbtn" data-view="view-history" onclick="goto('view-history')">
+      <div class="nicon">📋</div>History
     </button>
   </div>
 
@@ -518,82 +434,62 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ================== STATE ================== */
-let FUEL = [], SERVICE = [], DRIVER = [], TRIPS = [];
+let FUEL = [], SERVICE = [], DRIVER = [], EMI = [];
 let period = 'cycle'; // 'cycle' | 'week' | 'all'
-let cycleOffset = 0; // 0 = current cycle, -1 = previous, etc. (never > 0)
-let weekOffset = 0;  // same idea for weeks
+let cycleOffset = 0; let weekOffset = 0;
 let addType = 'fuel';
 let fuelTypeSel = 'CNG';
 let histFilter = 'all';
 let editState = { kind:null, id:null };
+let currentCategory = null; // which category detail page is open
 
 /* ================== DATE HELPERS ================== */
 function toDate(str){ return new Date(str + 'T12:00:00'); }
-
-// Billing cycle: 10th of a month to 9th of next month
 function cycleStart(d){
-  const day = d.getDate();
-  const y = d.getFullYear(), m = d.getMonth();
+  const day = d.getDate(); const y = d.getFullYear(), m = d.getMonth();
   if(day >= 10) return new Date(y, m, 10);
   return new Date(y, m - 1, 10);
 }
-function cycleKey(dateStr){
-  const d = toDate(dateStr);
-  const s = cycleStart(d);
-  return `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-10`;
-}
+function cycleKey(dateStr){ const s = cycleStart(toDate(dateStr)); return `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-10`; }
+function todayStr(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function currentCycleKey(){ return cycleKey(todayStr()); }
 function cycleKeyWithOffset(offset){
-  const cur = currentCycleKey();
-  const [y,m] = cur.split('-').map(Number);
+  const cur = currentCycleKey(); const [y,m] = cur.split('-').map(Number);
   const d = new Date(y, m-1+offset, 10);
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-10`;
 }
 function activeCycleKey(){ return cycleKeyWithOffset(cycleOffset); }
 function cycleOffsetForKey(key){
-  const cur = currentCycleKey().split('-').map(Number);
-  const k = key.split('-').map(Number);
+  const cur = currentCycleKey().split('-').map(Number); const k = key.split('-').map(Number);
   return (k[0]*12+k[1]) - (cur[0]*12+cur[1]);
 }
 function cycleLabel(key){
   const [y,m] = key.split('-').map(Number);
-  const start = new Date(y, m-1, 10);
-  const end = new Date(y, m, 9);
+  const start = new Date(y, m-1, 10); const end = new Date(y, m, 9);
   const fmt = (d)=> d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   return `Cycle · ${fmt(start)} – ${fmt(end)}`;
 }
-
-// Week: starts Sunday
-function weekStart(d){
-  const nd = new Date(d);
-  nd.setDate(nd.getDate() - nd.getDay());
-  nd.setHours(0,0,0,0);
-  return nd;
+function cycleShortLabel(key){
+  const [y,m] = key.split('-').map(Number);
+  return new Date(y, m-1, 10).toLocaleDateString('en-GB',{month:'short'});
 }
-function weekKey(dateStr){
-  const s = weekStart(toDate(dateStr));
-  return `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-${String(s.getDate()).padStart(2,'0')}`;
-}
+function weekStart(d){ const nd = new Date(d); nd.setDate(nd.getDate() - nd.getDay()); nd.setHours(0,0,0,0); return nd; }
+function weekKey(dateStr){ const s = weekStart(toDate(dateStr)); return `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-${String(s.getDate()).padStart(2,'0')}`; }
 function currentWeekKey(){ return weekKey(todayStr()); }
 function weekKeyWithOffset(offset){
-  const d = new Date(toDate(currentWeekKey()));
-  d.setDate(d.getDate() + offset*7);
+  const d = new Date(toDate(currentWeekKey())); d.setDate(d.getDate() + offset*7);
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 function activeWeekKey(){ return weekKeyWithOffset(weekOffset); }
 function weekLabel(key){
-  const s = toDate(key);
-  const e = new Date(s); e.setDate(e.getDate()+6);
+  const s = toDate(key); const e = new Date(s); e.setDate(e.getDate()+6);
   const fmt = (d)=> d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   return `Week · ${fmt(s)} – ${fmt(e)}`;
 }
-function todayStr(){
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function fmtDate(dateStr){
-  return toDate(dateStr).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});
-}
+function weekShortLabel(key){ return toDate(key).toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
+function weekRangeForKey(key){ const start = toDate(key); const end = new Date(start); end.setDate(end.getDate()+6); return { start, end }; }
+function fmtDate(dateStr){ return toDate(dateStr).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'}); }
+
 function inPeriod(dateStr){
   if(period === 'all') return true;
   if(period === 'cycle') return cycleKey(dateStr) === activeCycleKey();
@@ -601,46 +497,39 @@ function inPeriod(dateStr){
 }
 function periodRange(){
   if(period==='cycle'){
-    const key = activeCycleKey();
-    const [y,m] = key.split('-').map(Number);
+    const key = activeCycleKey(); const [y,m] = key.split('-').map(Number);
     return { start: new Date(y, m-1, 10), end: new Date(y, m, 9) };
   }
   if(period==='week'){
-    const start = toDate(activeWeekKey());
-    const end = new Date(start); end.setDate(end.getDate()+6);
+    const start = toDate(activeWeekKey()); const end = new Date(start); end.setDate(end.getDate()+6);
     return { start, end };
   }
-  return null; // all time — no range needed
+  return null;
 }
 function daysNum(d){ return Math.floor(d.getTime()/86400000); }
-// What fraction of a fill-to-fill segment's km actually falls inside the selected period,
-// splitting proportionally by days instead of dumping the whole segment on the later date.
 function segmentOverlapFraction(startDateStr, endDateStr, range){
   if(!range) return 1;
-  const s = daysNum(toDate(startDateStr));
-  const e = daysNum(toDate(endDateStr));
-  const ps = daysNum(range.start);
-  const pe = daysNum(range.end);
+  const s = daysNum(toDate(startDateStr)); const e = daysNum(toDate(endDateStr));
+  const ps = daysNum(range.start); const pe = daysNum(range.end);
   const totalDays = e - s;
   if(totalDays <= 0) return (e>=ps && e<=pe) ? 1 : 0;
-  const overlapStart = Math.max(s, ps-1);
-  const overlapEnd = Math.min(e, pe);
+  const overlapStart = Math.max(s, ps-1); const overlapEnd = Math.min(e, pe);
   const overlapLen = Math.max(0, overlapEnd - overlapStart);
   return overlapLen/totalDays;
 }
 
 /* ================== DATA LOAD ================== */
 async function loadAll(){
-  const [f,s,d,t] = await Promise.all([
+  const [f,s,d,e] = await Promise.all([
     sb.from('punch_fuel').select('*').order('odometer',{ascending:true}),
     sb.from('punch_service').select('*').order('expense_date',{ascending:false}),
     sb.from('punch_driver').select('*').order('expense_date',{ascending:false}),
-    sb.from('punch_trips').select('*').order('trip_date',{ascending:false}),
+    sb.from('punch_emi').select('*').order('expense_date',{ascending:false}),
   ]);
   FUEL = f.data || [];
   SERVICE = s.data || [];
   DRIVER = d.data || [];
-  TRIPS = t.data || [];
+  EMI = e.data || [];
   render();
 }
 
@@ -648,12 +537,10 @@ async function loadAll(){
    Fuel entries sorted by odometer ascending.
    Segment i: between FUEL[i] and FUEL[i+1].
    Segment km = FUEL[i+1].odometer - FUEL[i].odometer
-   Segment is "powered by" FUEL[i]'s fuel_type & attributed to FUEL[i+1]'s date (when the km were confirmed driven).
-   Segment cost = FUEL[i].amount, Segment qty = FUEL[i].quantity
+   Segment is "powered by" FUEL[i]'s fuel_type & attributed to FUEL[i+1]'s date.
+   Backup top-ups are excluded as segment-starters so they don't misclaim a stretch of km.
 */
 function buildSegments(){
-  // Backup top-ups don't get to "claim" the stretch of km after them — they're
-  // excluded as segment-starters, so the real fuel type before/after just merges.
   const attributors = FUEL.filter(x=>!x.is_backup);
   const segs = [];
   for(let i=0;i<attributors.length-1;i++){
@@ -662,8 +549,7 @@ function buildSegments(){
     if(km <= 0) continue;
     segs.push({
       km, type:a.fuel_type, qty:a.quantity, cost:a.amount,
-      startDate: a.fill_date, attribDate: b.fill_date,
-      location: b.location || null
+      startDate: a.fill_date, attribDate: b.fill_date, location: b.location || null
     });
   }
   return segs;
@@ -678,8 +564,7 @@ function segmentStatsForRange(range){
     if(frac<=0) return;
     segCount++;
     const km = s.km*frac;
-    totalKm += km;
-    segFuelCost += Number(s.cost)*frac;
+    totalKm += km; segFuelCost += Number(s.cost)*frac;
     if(s.type==='CNG'){ cngKm += km; cngQty += Number(s.qty)*frac; }
   });
   return { totalKm, cngKm, cngQty, segFuelCost, segCount };
@@ -688,38 +573,31 @@ function expenseTotalsForPredicate(pred){
   const fuelIn = FUEL.filter(x=>pred(x.fill_date));
   const serviceIn = SERVICE.filter(x=>pred(x.expense_date));
   const driverIn = DRIVER.filter(x=>pred(x.expense_date));
+  const emiIn = EMI.filter(x=>pred(x.expense_date));
   const fuelCngCost = fuelIn.filter(x=>x.fuel_type==='CNG').reduce((a,x)=>a+Number(x.amount),0);
   const fuelPetrolCost = fuelIn.filter(x=>x.fuel_type==='Petrol').reduce((a,x)=>a+Number(x.amount),0);
   const fuelTotal = fuelCngCost + fuelPetrolCost;
   const serviceTotal = serviceIn.reduce((a,x)=>a+Number(x.amount),0);
   const driverTotal = driverIn.reduce((a,x)=>a+Number(x.amount),0);
-  return { fuelCngCost, fuelPetrolCost, fuelTotal, serviceTotal, driverTotal, grandTotal: fuelTotal+serviceTotal+driverTotal };
+  const emiTotal = emiIn.reduce((a,x)=>a+Number(x.amount),0);
+  return { fuelCngCost, fuelPetrolCost, fuelTotal, serviceTotal, driverTotal, emiTotal,
+    grandTotal: fuelTotal+serviceTotal+driverTotal+emiTotal };
 }
 function previousPeriodTotals(){
-  if(period==='cycle'){
-    const prevKey = cycleKeyWithOffset(cycleOffset-1);
-    return expenseTotalsForPredicate(d=>cycleKey(d)===prevKey);
-  }
-  if(period==='week'){
-    const prevKey = weekKeyWithOffset(weekOffset-1);
-    return expenseTotalsForPredicate(d=>weekKey(d)===prevKey);
-  }
-  return null; // no "previous" concept for all-time
+  if(period==='cycle'){ const prevKey = cycleKeyWithOffset(cycleOffset-1); return expenseTotalsForPredicate(d=>cycleKey(d)===prevKey); }
+  if(period==='week'){ const prevKey = weekKeyWithOffset(weekOffset-1); return expenseTotalsForPredicate(d=>weekKey(d)===prevKey); }
+  return null;
 }
 function computeStats(){
-  const { fuelCngCost, fuelPetrolCost, fuelTotal, serviceTotal, driverTotal, grandTotal } =
+  const { fuelCngCost, fuelPetrolCost, fuelTotal, serviceTotal, driverTotal, emiTotal, grandTotal } =
     expenseTotalsForPredicate(inPeriod);
   const prevTotals = previousPeriodTotals();
 
-  // Distance/mileage: prorate each fill-to-fill segment across the days it actually
-  // spans, so a big gap that closes today doesn't get dumped entirely on today's week.
   const range = periodRange();
   const { totalKm, cngKm, cngQty, segFuelCost, segCount } = segmentStatsForRange(range);
   const cngAvg = cngQty > 0 ? (cngKm / cngQty) : null;
   const costPerKm = totalKm > 0 ? (segFuelCost / totalKm) : null;
 
-  // Best / last fill average — always all-time, not period-filtered, so a standout
-  // trip (or your latest tank) shows up regardless of which period chip is selected.
   let best = null, last = null;
   buildSegments().forEach(s=>{
     const avg = Number(s.qty) > 0 ? s.km / Number(s.qty) : null;
@@ -730,33 +608,30 @@ function computeStats(){
   });
 
   return {
-    fuelCngCost, fuelPetrolCost, fuelTotal, serviceTotal, driverTotal, grandTotal,
+    fuelCngCost, fuelPetrolCost, fuelTotal, serviceTotal, driverTotal, emiTotal, grandTotal,
     totalKm, cngAvg, costPerKm, segCount, best, last, prevTotals
   };
 }
 
 /* ================== RENDER ================== */
 function money(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function unitFor(t){ return t==='CNG' ? 'km/kg' : 'km/L'; }
 
 function render(){
   const st = computeStats();
 
-  // period label
   let label = 'All time';
   if(period==='cycle') label = cycleLabel(activeCycleKey());
   if(period==='week') label = weekLabel(activeWeekKey());
   document.getElementById('periodLabel').textContent = label;
 
-  // nav arrows + past-cycles link — only meaningful for cycle/week, not all-time
   const showNav = period !== 'all';
   document.getElementById('arrowPrev').classList.toggle('hidden', !showNav);
   document.getElementById('arrowNext').classList.toggle('hidden', !showNav);
   document.getElementById('arrowNext').disabled = period==='cycle' ? cycleOffset>=0 : period==='week' ? weekOffset>=0 : true;
-  document.getElementById('pastLinkRow').style.display = period==='cycle' ? 'block' : 'none';
 
   document.getElementById('heroTotal').innerHTML = money(st.grandTotal);
 
-  // trend vs previous period
   const trendEl = document.getElementById('trendLine');
   if(st.prevTotals){
     const prev = st.prevTotals.grandTotal;
@@ -769,13 +644,9 @@ function render(){
       trendEl.textContent = `${arrow} ${Math.abs(pct).toFixed(0)}% vs ${periodWord}`;
     } else if(st.grandTotal > 0){
       trendEl.className = 'trend flat';
-      trendEl.textContent = `No spend logged in the ${period==='cycle'?'previous cycle':'previous week'} to compare`;
-    } else {
-      trendEl.textContent = '';
-    }
-  } else {
-    trendEl.textContent = '';
-  }
+      trendEl.textContent = `No spend in the previous ${period==='cycle'?'cycle':'week'} to compare`;
+    } else { trendEl.textContent = ''; }
+  } else { trendEl.textContent = ''; }
 
   // split bar
   const bar = document.getElementById('splitBar');
@@ -785,111 +656,128 @@ function render(){
     {name:'Fuel', val: st.fuelTotal, grad:'linear-gradient(90deg,var(--fuel-a),var(--fuel-b))', dot:'var(--fuel-a)'},
     {name:'Driver', val: st.driverTotal, grad:'linear-gradient(90deg,var(--driver-a),var(--driver-b))', dot:'var(--driver-a)'},
     {name:'Service', val: st.serviceTotal, grad:'linear-gradient(90deg,var(--service-a),var(--service-b))', dot:'var(--service-a)'},
+    {name:'EMI', val: st.emiTotal, grad:'linear-gradient(90deg,var(--emi-a),var(--emi-b))', dot:'var(--emi-a)'},
   ];
   const total = st.grandTotal || 1;
   parts.forEach(p=>{
     const w = (p.val/total*100).toFixed(1);
-    if(p.val>0){
-      const seg = document.createElement('div');
-      seg.style.width = w+'%';
-      seg.style.background = p.grad;
-      bar.appendChild(seg);
-    }
+    if(p.val>0){ const seg = document.createElement('div'); seg.style.width = w+'%'; seg.style.background = p.grad; bar.appendChild(seg); }
     const leg = document.createElement('span');
     leg.innerHTML = `<span class="dot" style="background:${p.dot}"></span>${p.name} ${money(p.val)}`;
     legend.appendChild(leg);
   });
 
-  document.getElementById('statFuel').textContent = money(st.fuelTotal);
-  document.getElementById('statFuelSplit').textContent = `CNG ${money(st.fuelCngCost)} · Petrol ${money(st.fuelPetrolCost)}`;
-  document.getElementById('statDriver').textContent = money(st.driverTotal);
-  document.getElementById('statService').textContent = money(st.serviceTotal);
-  document.getElementById('statKm').textContent = st.totalKm > 0 ? `${Math.round(st.totalKm)} km` : '– km';
-  document.getElementById('statKmSub').textContent = st.segCount>0 ? 'from odometer' : 'add 2+ fills';
-  document.getElementById('statCngAvg').textContent = st.cngAvg ? st.cngAvg.toFixed(1) : '–';
-  document.getElementById('statCostPerKm').textContent = st.costPerKm ? '₹'+st.costPerKm.toFixed(1) : '–';
-  document.getElementById('statCostPerKmSub').textContent = st.costPerKm ? 'overall fuel cost/km' : 'needs 2+ fills';
-
-  const unitFor = (t)=> t==='CNG' ? 'km/kg' : 'km/L';
-  if(st.best){
-    document.getElementById('statBestAvg').textContent = `${st.best.avg.toFixed(1)} ${unitFor(st.best.type)}`;
-    document.getElementById('statBestAvgSub').textContent = st.best.location ? `${st.best.location} · ${fmtDate(st.best.date)}` : `all time · ${fmtDate(st.best.date)}`;
-  } else {
-    document.getElementById('statBestAvg').textContent = '–';
-    document.getElementById('statBestAvgSub').textContent = 'needs 2+ fills';
-  }
-  if(st.last){
-    document.getElementById('statLastAvg').textContent = `${st.last.avg.toFixed(1)} ${unitFor(st.last.type)}`;
-    document.getElementById('statLastAvgSub').textContent = st.last.location ? `${st.last.location} · ${fmtDate(st.last.date)}` : fmtDate(st.last.date);
-  } else {
-    document.getElementById('statLastAvg').textContent = '–';
-    document.getElementById('statLastAvgSub').textContent = 'needs 2+ fills';
-  }
+  // minimal category rows
+  const rowsEl = document.getElementById('catRows');
+  const fuelCount = FUEL.filter(x=>inPeriod(x.fill_date)).length;
+  const driverCount = DRIVER.filter(x=>inPeriod(x.expense_date)).length;
+  const serviceCount = SERVICE.filter(x=>inPeriod(x.expense_date)).length;
+  const emiCount = EMI.filter(x=>inPeriod(x.expense_date)).length;
+  const fuelSub = st.totalKm>0
+    ? `${Math.round(st.totalKm)} km${st.cngAvg ? ' · '+st.cngAvg.toFixed(1)+' km/kg avg' : ''}`
+    : 'No distance yet · add another fill-up';
+  const rows = [
+    { kind:'fuel', icon:'⛽', grad:'linear-gradient(135deg,var(--fuel-a),var(--fuel-b))', title:'Fuel', amt:st.fuelTotal, sub:fuelSub },
+    { kind:'driver', icon:'🧑‍✈️', grad:'linear-gradient(135deg,var(--driver-a),var(--driver-b))', title:'Driver', amt:st.driverTotal, sub:`${driverCount} payment${driverCount===1?'':'s'}` },
+    { kind:'service', icon:'🧰', grad:'linear-gradient(135deg,var(--service-a),var(--service-b))', title:'Service & other', amt:st.serviceTotal, sub:`${serviceCount} expense${serviceCount===1?'':'s'}` },
+    { kind:'emi', icon:'🏦', grad:'linear-gradient(135deg,var(--emi-a),var(--emi-b))', title:'Car EMI', amt:st.emiTotal, sub:`${emiCount} payment${emiCount===1?'':'s'}` },
+  ];
+  rowsEl.innerHTML = rows.map(r=>`
+    <div class="cat-row" onclick="openCategory('${r.kind}')">
+      <div class="cat-ico" style="background:${r.grad}">${r.icon}</div>
+      <div class="cat-meta"><div class="cat-title">${r.title}</div><div class="cat-sub">${r.sub}</div></div>
+      <div class="cat-amt">${money(r.amt)}</div>
+      <div class="cat-chevron">›</div>
+    </div>`).join('');
 
   renderRecent();
   renderHistory();
-  renderTrips();
   renderPastCycles();
+  if(currentCategory) renderCategoryDetail();
 }
 
 function iconFor(kind){
   if(kind==='fuel') return {ico:'⛽', bg:'linear-gradient(135deg,var(--fuel-a),var(--fuel-b))'};
   if(kind==='service') return {ico:'🧰', bg:'linear-gradient(135deg,var(--service-a),var(--service-b))'};
   if(kind==='driver') return {ico:'🧑‍✈️', bg:'linear-gradient(135deg,var(--driver-a),var(--driver-b))'};
+  if(kind==='emi') return {ico:'🏦', bg:'linear-gradient(135deg,var(--emi-a),var(--emi-b))'};
   return {ico:'•', bg:'#ccc'};
 }
-
 function allEntries(){
   const items = [];
   FUEL.forEach(x=>items.push({kind:'fuel', date:x.fill_date, title:`${x.fuel_type} fill-up${x.is_backup?' <span class="tag-backup">BACKUP</span>':''}`, sub:`${x.quantity}${x.fuel_type==='CNG'?'kg':'L'} · odo ${x.odometer}km${x.location ? ' · '+x.location : ''}`, amount:x.amount, id:x.id}));
   SERVICE.forEach(x=>items.push({kind:'service', date:x.expense_date, title:x.note || 'Service expense', sub:'Service & other', amount:x.amount, id:x.id}));
   DRIVER.forEach(x=>items.push({kind:'driver', date:x.expense_date, title:x.note || 'Driver expense', sub:'Driver', amount:x.amount, id:x.id}));
+  EMI.forEach(x=>items.push({kind:'emi', date:x.expense_date, title:x.note || 'Car EMI', sub:'EMI', amount:x.amount, id:x.id}));
   items.sort((a,b)=> b.date.localeCompare(a.date));
   return items;
 }
-
+function entryRowHtml(it, withDelete){
+  const {ico,bg} = iconFor(it.kind);
+  return `<div class="entry" onclick="openEditEntry('${it.kind}','${it.id}')">
+    <div class="ico" style="background:${bg}">${ico}</div>
+    <div class="meta"><div class="t1">${it.title}</div><div class="t2">${fmtDate(it.date)} · ${it.sub}</div></div>
+    <div class="amt">${money(it.amount)}</div>
+    ${withDelete ? `<button class="del-x" onclick="event.stopPropagation(); deleteEntry('${it.kind}','${it.id}')">✕</button>` : ''}
+  </div>`;
+}
 function renderRecent(){
   const list = allEntries().slice(0,6);
   const el = document.getElementById('recentList');
   if(list.length===0){ el.innerHTML = '<div class="empty-note">No entries yet — tap + Add to log your first fill-up.</div>'; return; }
-  el.innerHTML = list.map(it=>{
-    const {ico,bg} = iconFor(it.kind);
-    return `<div class="entry" onclick="openEditEntry('${it.kind}','${it.id}')">
-      <div class="ico" style="background:${bg}">${ico}</div>
-      <div class="meta"><div class="t1">${it.title}</div><div class="t2">${fmtDate(it.date)} · ${it.sub}</div></div>
-      <div class="amt">${money(it.amount)}</div>
-    </div>`;
-  }).join('');
+  el.innerHTML = list.map(it=>entryRowHtml(it,false)).join('');
 }
-
 function renderHistory(){
   let items = allEntries();
   if(histFilter !== 'all') items = items.filter(x=>x.kind===histFilter);
   const el = document.getElementById('histList');
   if(items.length===0){ el.innerHTML = '<div class="empty-note">Nothing here yet.</div>'; return; }
-  el.innerHTML = items.map(it=>{
-    const {ico,bg} = iconFor(it.kind);
-    return `<div class="entry" onclick="openEditEntry('${it.kind}','${it.id}')">
-      <div class="ico" style="background:${bg}">${ico}</div>
-      <div class="meta"><div class="t1">${it.title}</div><div class="t2">${fmtDate(it.date)} · ${it.sub}</div></div>
-      <div class="amt">${money(it.amount)}</div>
-      <button class="del-x" onclick="event.stopPropagation(); deleteEntry('${it.kind}','${it.id}')">✕</button>
-    </div>`;
-  }).join('');
+  el.innerHTML = items.map(it=>entryRowHtml(it,true)).join('');
 }
 
-function renderTrips(){
-  const el = document.getElementById('tripList');
-  if(TRIPS.length===0){ el.innerHTML = '<div class="empty-note">No trips logged yet.</div>'; return; }
-  el.innerHTML = TRIPS.slice(0,20).map(t=>`
-    <div class="trip-card" onclick="openEditTrip('${t.id}')">
-      <div class="ico" style="background:linear-gradient(135deg,var(--dist-a),var(--dist-b));width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;">🧭</div>
-      <div class="meta">
-        <div class="trip-route">${t.start_location}<span class="arrow">→</span>${t.end_location}</div>
-        <div class="trip-date">${fmtDate(t.trip_date)}${t.note ? ' · '+t.note : ''}</div>
-      </div>
-      <button class="del-x" onclick="event.stopPropagation(); deleteEntry('trip','${t.id}')">✕</button>
-    </div>`).join('');
+/* ---------- Category detail (drill-down from home rows) ---------- */
+function openCategory(kind){
+  currentCategory = kind;
+  goto('view-category');
+  renderCategoryDetail();
+}
+function renderCategoryDetail(){
+  const kind = currentCategory;
+  if(!kind) return;
+  const st = computeStats();
+  const {ico,bg} = iconFor(kind);
+  document.getElementById('catDetailIco').style.background = bg;
+  document.getElementById('catDetailIco').textContent = ico;
+  const titles = { fuel:'Fuel', driver:'Driver', service:'Service & other', emi:'Car EMI' };
+  document.getElementById('catDetailTitle').textContent = titles[kind];
+  let label = 'All time';
+  if(period==='cycle') label = cycleLabel(activeCycleKey());
+  if(period==='week') label = weekLabel(activeWeekKey());
+  document.getElementById('catDetailPeriod').textContent = label;
+
+  const amtMap = { fuel: st.fuelTotal, driver: st.driverTotal, service: st.serviceTotal, emi: st.emiTotal };
+  document.getElementById('catDetailAmt').textContent = money(amtMap[kind]);
+  document.getElementById('catDetailSub').textContent =
+    kind==='fuel' ? `CNG ${money(st.fuelCngCost)} · Petrol ${money(st.fuelPetrolCost)}` : 'Total this period';
+
+  const extra = document.getElementById('catExtraStats');
+  if(kind==='fuel'){
+    extra.style.display = 'grid';
+    extra.innerHTML = `
+      <div class="stat-card c-flat"><div class="icon">📉</div><div><div class="stitle">Cost per km</div><div class="sval">${st.costPerKm ? '₹'+st.costPerKm.toFixed(1) : '–'}</div><div class="ssub">${st.costPerKm?'overall':'needs 2+ fills'}</div></div></div>
+      <div class="stat-card c-flat"><div class="icon">🔥</div><div><div class="stitle">CNG average</div><div class="sval">${st.cngAvg ? st.cngAvg.toFixed(1) : '–'}</div><div class="ssub">km per kg</div></div></div>
+      <div class="stat-card c-best"><div class="icon">🏆</div><div><div class="stitle">Best average</div><div class="sval">${st.best ? st.best.avg.toFixed(1)+' '+unitFor(st.best.type) : '–'}</div><div class="ssub">${st.best ? (st.best.location ? st.best.location+' · '+fmtDate(st.best.date) : fmtDate(st.best.date)) : 'needs 2+ fills'}</div></div></div>
+      <div class="stat-card c-flat"><div class="icon">🕓</div><div><div class="stitle">Last fill average</div><div class="sval">${st.last ? st.last.avg.toFixed(1)+' '+unitFor(st.last.type) : '–'}</div><div class="ssub">${st.last ? fmtDate(st.last.date) : 'needs 2+ fills'}</div></div></div>
+    `;
+  } else {
+    extra.style.display = 'none';
+    extra.innerHTML = '';
+  }
+
+  let items = allEntries().filter(x=>x.kind===kind && inPeriod(x.date));
+  const el = document.getElementById('catEntryList');
+  if(items.length===0){ el.innerHTML = '<div class="empty-note">Nothing logged in this period yet.</div>'; return; }
+  el.innerHTML = items.map(it=>entryRowHtml(it,true)).join('');
 }
 
 /* ================== ACTIONS ================== */
@@ -904,17 +792,12 @@ async function saveFuel(){
   const row = { fuel_type: fuelTypeSel, amount, quantity, odometer, fill_date, location, is_backup,
     cycle_key: cycleKey(fill_date), week_key: weekKey(fill_date) };
   let error;
-  if(editState.kind==='fuel' && editState.id){
-    ({error} = await sb.from('punch_fuel').update(row).eq('id', editState.id));
-  } else {
-    ({error} = await sb.from('punch_fuel').insert(row));
-  }
+  if(editState.kind==='fuel' && editState.id){ ({error} = await sb.from('punch_fuel').update(row).eq('id', editState.id)); }
+  else { ({error} = await sb.from('punch_fuel').insert(row)); }
   if(error){ showToast('Error saving'); console.error(error); return; }
   showToast(editState.id ? 'Fuel entry updated' : 'Fuel entry saved');
   const wasEdit = !!editState.id;
-  cancelEdit();
-  clearFuelForm();
-  await loadAll();
+  cancelEdit(); clearFuelForm(); await loadAll();
   if(wasEdit) goto('view-history');
 }
 async function saveService(){
@@ -924,11 +807,8 @@ async function saveService(){
   if(!amount){ showToast('Enter an amount'); return; }
   const row = { amount, note, expense_date, cycle_key: cycleKey(expense_date), week_key: weekKey(expense_date) };
   let error;
-  if(editState.kind==='service' && editState.id){
-    ({error} = await sb.from('punch_service').update(row).eq('id', editState.id));
-  } else {
-    ({error} = await sb.from('punch_service').insert(row));
-  }
+  if(editState.kind==='service' && editState.id){ ({error} = await sb.from('punch_service').update(row).eq('id', editState.id)); }
+  else { ({error} = await sb.from('punch_service').insert(row)); }
   if(error){ showToast('Error saving'); console.error(error); return; }
   showToast(editState.id ? 'Service expense updated' : 'Service expense saved');
   const wasEdit = !!editState.id;
@@ -944,11 +824,8 @@ async function saveDriver(){
   if(!amount){ showToast('Enter an amount'); return; }
   const row = { amount, note, expense_date, cycle_key: cycleKey(expense_date), week_key: weekKey(expense_date) };
   let error;
-  if(editState.kind==='driver' && editState.id){
-    ({error} = await sb.from('punch_driver').update(row).eq('id', editState.id));
-  } else {
-    ({error} = await sb.from('punch_driver').insert(row));
-  }
+  if(editState.kind==='driver' && editState.id){ ({error} = await sb.from('punch_driver').update(row).eq('id', editState.id)); }
+  else { ({error} = await sb.from('punch_driver').insert(row)); }
   if(error){ showToast('Error saving'); console.error(error); return; }
   showToast(editState.id ? 'Driver expense updated' : 'Driver expense saved');
   const wasEdit = !!editState.id;
@@ -957,28 +834,26 @@ async function saveDriver(){
   await loadAll();
   if(wasEdit) goto('view-history');
 }
-async function saveTrip(){
-  const start_location = document.getElementById('t-start').value.trim();
-  const end_location = document.getElementById('t-end').value.trim();
-  const note = document.getElementById('t-note').value.trim();
-  const trip_date = document.getElementById('t-date').value || todayStr();
-  if(!start_location || !end_location){ showToast('Enter start and end location'); return; }
-  const row = { start_location, end_location, note, trip_date };
+async function saveEmi(){
+  const amount = parseFloat(document.getElementById('e-amount').value);
+  const note = document.getElementById('e-note').value.trim();
+  const expense_date = document.getElementById('e-date').value || todayStr();
+  if(!amount){ showToast('Enter an amount'); return; }
+  const row = { amount, note, expense_date, cycle_key: cycleKey(expense_date), week_key: weekKey(expense_date) };
   let error;
-  if(editState.kind==='trip' && editState.id){
-    ({error} = await sb.from('punch_trips').update(row).eq('id', editState.id));
-  } else {
-    ({error} = await sb.from('punch_trips').insert(row));
-  }
+  if(editState.kind==='emi' && editState.id){ ({error} = await sb.from('punch_emi').update(row).eq('id', editState.id)); }
+  else { ({error} = await sb.from('punch_emi').insert(row)); }
   if(error){ showToast('Error saving'); console.error(error); return; }
-  showToast(editState.id ? 'Trip updated' : 'Trip logged');
+  showToast(editState.id ? 'EMI payment updated' : 'EMI payment saved');
+  const wasEdit = !!editState.id;
   cancelEdit();
-  document.getElementById('t-start').value=''; document.getElementById('t-end').value=''; document.getElementById('t-note').value='';
+  document.getElementById('e-amount').value=''; document.getElementById('e-note').value='';
   await loadAll();
+  if(wasEdit) goto('view-history');
 }
 async function deleteEntry(kind, id){
   if(!confirm('Delete this entry?')) return;
-  const table = kind==='trip' ? 'punch_trips' : kind==='fuel' ? 'punch_fuel' : kind==='service' ? 'punch_service' : 'punch_driver';
+  const table = kind==='fuel' ? 'punch_fuel' : kind==='service' ? 'punch_service' : kind==='driver' ? 'punch_driver' : 'punch_emi';
   const {error} = await sb.from(table).delete().eq('id', id);
   if(error){ showToast('Error deleting'); console.error(error); return; }
   showToast('Deleted');
@@ -1003,8 +878,7 @@ function openEditEntry(kind, id){
   document.getElementById('addSub').textContent = 'Update the details below and save.';
 
   if(kind==='fuel'){
-    const row = FUEL.find(x=>String(x.id)===String(id));
-    if(!row) return;
+    const row = FUEL.find(x=>String(x.id)===String(id)); if(!row) return;
     setFuelType(row.fuel_type);
     document.getElementById('f-amount').value = row.amount;
     document.getElementById('f-qty').value = row.quantity;
@@ -1014,48 +888,40 @@ function openEditEntry(kind, id){
     document.getElementById('f-backup').checked = !!row.is_backup;
     document.querySelector('#fuelForm .save-btn').textContent = 'Update fuel entry';
   } else if(kind==='service'){
-    const row = SERVICE.find(x=>String(x.id)===String(id));
-    if(!row) return;
+    const row = SERVICE.find(x=>String(x.id)===String(id)); if(!row) return;
     document.getElementById('s-amount').value = row.amount;
     document.getElementById('s-note').value = row.note || '';
     document.getElementById('s-date').value = row.expense_date;
     document.querySelector('#serviceForm .save-btn').textContent = 'Update service expense';
   } else if(kind==='driver'){
-    const row = DRIVER.find(x=>String(x.id)===String(id));
-    if(!row) return;
+    const row = DRIVER.find(x=>String(x.id)===String(id)); if(!row) return;
     document.getElementById('d-amount').value = row.amount;
     document.getElementById('d-note').value = row.note || '';
     document.getElementById('d-date').value = row.expense_date;
     document.querySelector('#driverForm .save-btn').textContent = 'Update driver expense';
+  } else if(kind==='emi'){
+    const row = EMI.find(x=>String(x.id)===String(id)); if(!row) return;
+    document.getElementById('e-amount').value = row.amount;
+    document.getElementById('e-note').value = row.note || '';
+    document.getElementById('e-date').value = row.expense_date;
+    document.querySelector('#emiForm .save-btn').textContent = 'Update EMI payment';
   }
-}
-function openEditTrip(id){
-  goto('view-trips');
-  const row = TRIPS.find(x=>String(x.id)===String(id));
-  if(!row) return;
-  editState = { kind:'trip', id };
-  document.getElementById('t-start').value = row.start_location;
-  document.getElementById('t-end').value = row.end_location;
-  document.getElementById('t-note').value = row.note || '';
-  document.getElementById('t-date').value = row.trip_date;
-  document.querySelector('#view-trips .save-btn').textContent = 'Update trip';
-  window.scrollTo({top:0, behavior:'smooth'});
 }
 function cancelEdit(){
   editState = { kind:null, id:null };
   document.getElementById('editBanner').style.display = 'none';
   document.getElementById('typeTabs').style.display = 'flex';
   document.getElementById('addTitle').textContent = 'Add entry';
-  document.getElementById('addSub').textContent = 'Log a fuel fill-up, service cost, or driver payment.';
+  document.getElementById('addSub').textContent = 'Log a fuel fill-up, service cost, driver payment, or EMI.';
   document.querySelector('#fuelForm .save-btn').textContent = 'Save fuel entry';
   document.querySelector('#serviceForm .save-btn').textContent = 'Save service expense';
   document.querySelector('#driverForm .save-btn').textContent = 'Save driver expense';
-  document.querySelector('#view-trips .save-btn').textContent = 'Save trip';
+  document.querySelector('#emiForm .save-btn').textContent = 'Save EMI payment';
   clearFuelForm();
   document.getElementById('s-amount').value=''; document.getElementById('s-note').value='';
   document.getElementById('d-amount').value=''; document.getElementById('d-note').value='';
-  document.getElementById('t-start').value=''; document.getElementById('t-end').value=''; document.getElementById('t-note').value='';
-  ['f-date','s-date','d-date','t-date'].forEach(id=>{ document.getElementById(id).value = todayStr(); });
+  document.getElementById('e-amount').value=''; document.getElementById('e-note').value='';
+  ['f-date','s-date','d-date','e-date'].forEach(id=>{ document.getElementById(id).value = todayStr(); });
 }
 
 /* ================== UI WIRING ================== */
@@ -1063,14 +929,16 @@ function goto(viewId){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(viewId).classList.add('active');
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===viewId));
+  if(viewId !== 'view-category') currentCategory = null;
 }
 function setAddType(type){
   addType = type;
-  document.querySelectorAll('.type-tab').forEach(t=>t.classList.remove('active-fuel','active-driver','active-service'));
+  document.querySelectorAll('.type-tab').forEach(t=>t.classList.remove('active-fuel','active-driver','active-service','active-emi'));
   document.querySelector(`.type-tab[data-type="${type}"]`).classList.add('active-'+type);
   document.getElementById('fuelForm').style.display = type==='fuel' ? 'block':'none';
   document.getElementById('serviceForm').style.display = type==='service' ? 'block':'none';
   document.getElementById('driverForm').style.display = type==='driver' ? 'block':'none';
+  document.getElementById('emiForm').style.display = type==='emi' ? 'block':'none';
 }
 function setFuelType(type){
   fuelTypeSel = type;
@@ -1094,28 +962,45 @@ document.querySelectorAll('.chip[data-period]').forEach(c=>{
   });
 });
 function stepPeriod(dir){
-  if(period==='cycle'){
-    const next = cycleOffset + dir;
-    if(next > 0) return; // can't go past the current cycle
-    cycleOffset = next;
-  } else if(period==='week'){
-    const next = weekOffset + dir;
-    if(next > 0) return;
-    weekOffset = next;
-  }
+  if(period==='cycle'){ const next = cycleOffset + dir; if(next > 0) return; cycleOffset = next; }
+  else if(period==='week'){ const next = weekOffset + dir; if(next > 0) return; weekOffset = next; }
   render();
 }
-function cycleShortLabel(key){
-  const [y,m] = key.split('-').map(Number);
-  return new Date(y, m-1, 10).toLocaleDateString('en-GB',{month:'short'});
+document.querySelectorAll('.chip[data-hist]').forEach(c=>{
+  c.addEventListener('click', ()=>{
+    document.querySelectorAll('.chip[data-hist]').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    histFilter = c.dataset.hist;
+    renderHistory();
+  });
+});
+
+/* ---------- Past cycles & trends ---------- */
+function jumpToCycle(key){
+  period = 'cycle';
+  cycleOffset = cycleOffsetForKey(key);
+  document.querySelectorAll('.chip[data-period]').forEach(x=>x.classList.toggle('active', x.dataset.period==='cycle'));
+  goto('view-home');
+  render();
 }
-function weekShortLabel(key){
-  return toDate(key).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-}
-function weekRangeForKey(key){
-  const start = toDate(key);
-  const end = new Date(start); end.setDate(end.getDate()+6);
-  return { start, end };
+function renderPastCycles(){
+  const el = document.getElementById('pastCyclesList');
+  if(!el) return;
+  const keys = new Set([currentCycleKey()]);
+  FUEL.forEach(x=>keys.add(cycleKey(x.fill_date)));
+  SERVICE.forEach(x=>keys.add(cycleKey(x.expense_date)));
+  DRIVER.forEach(x=>keys.add(cycleKey(x.expense_date)));
+  EMI.forEach(x=>keys.add(cycleKey(x.expense_date)));
+  const sorted = Array.from(keys).sort().reverse();
+  el.innerHTML = sorted.map(key=>{
+    const tot = expenseTotalsForPredicate(d=>cycleKey(d)===key);
+    const isCurrent = key === currentCycleKey();
+    return `<div class="entry" onclick="jumpToCycle('${key}')">
+      <div class="ico" style="background:linear-gradient(135deg,var(--driver-a),var(--driver-b));">📅</div>
+      <div class="meta"><div class="t1">${cycleLabel(key)}${isCurrent?' · current':''}</div><div class="t2">Fuel ${money(tot.fuelTotal)} · Driver ${money(tot.driverTotal)} · Service ${money(tot.serviceTotal)} · EMI ${money(tot.emiTotal)}</div></div>
+      <div class="amt">${money(tot.grandTotal)}</div>
+    </div>`;
+  }).join('');
 }
 function buildCycleSeries(n){
   const arr = [];
@@ -1149,14 +1034,10 @@ function renderBarChart(elId, items, colorA, colorB, valueFmt){
     const y = h - padBottom - barH;
     bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH,2).toFixed(1)}" rx="5" fill="url(#g-${elId})"></rect>`;
     bars += `<text x="${(x+barW/2).toFixed(1)}" y="${h-padBottom+13}" font-size="8.5" fill="#9B98AC" text-anchor="middle" font-family="Inter,sans-serif">${it.label}</text>`;
-    if(it.value>0){
-      bars += `<text x="${(x+barW/2).toFixed(1)}" y="${(y-4).toFixed(1)}" font-size="8.5" font-weight="700" fill="#1C1B29" text-anchor="middle" font-family="Inter,sans-serif">${valueFmt(it.value)}</text>`;
-    }
+    if(it.value>0){ bars += `<text x="${(x+barW/2).toFixed(1)}" y="${(y-4).toFixed(1)}" font-size="8.5" font-weight="700" fill="#1C1B29" text-anchor="middle" font-family="Inter,sans-serif">${valueFmt(it.value)}</text>`; }
   });
   el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="xMidYMid meet">
-    <defs><linearGradient id="g-${elId}" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0%" stop-color="${colorA}"/><stop offset="100%" stop-color="${colorB}"/>
-    </linearGradient></defs>
+    <defs><linearGradient id="g-${elId}" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="${colorA}"/><stop offset="100%" stop-color="${colorB}"/></linearGradient></defs>
     ${bars}
   </svg>`;
 }
@@ -1173,44 +1054,9 @@ function setPastTab(tab){
   document.getElementById('pastChartsWrap').style.display = tab==='charts' ? 'block' : 'none';
   if(tab==='charts') renderCharts();
 }
-function jumpToCycle(key){
-  period = 'cycle';
-  cycleOffset = cycleOffsetForKey(key);
-  document.querySelectorAll('.chip[data-period]').forEach(x=>x.classList.toggle('active', x.dataset.period==='cycle'));
-  goto('view-home');
-  render();
-}
-function renderPastCycles(){
-  const el = document.getElementById('pastCyclesList');
-  if(!el) return;
-  const keys = new Set([currentCycleKey()]);
-  FUEL.forEach(x=>keys.add(cycleKey(x.fill_date)));
-  SERVICE.forEach(x=>keys.add(cycleKey(x.expense_date)));
-  DRIVER.forEach(x=>keys.add(cycleKey(x.expense_date)));
-  const sorted = Array.from(keys).sort().reverse();
-  el.innerHTML = sorted.map(key=>{
-    const tot = expenseTotalsForPredicate(d=>cycleKey(d)===key);
-    const isCurrent = key === currentCycleKey();
-    return `<div class="entry" onclick="jumpToCycle('${key}')">
-      <div class="ico" style="background:linear-gradient(135deg,var(--driver-a),var(--driver-b));">📅</div>
-      <div class="meta"><div class="t1">${cycleLabel(key)}${isCurrent?' · current':''}</div><div class="t2">Fuel ${money(tot.fuelTotal)} · Driver ${money(tot.driverTotal)} · Service ${money(tot.serviceTotal)}</div></div>
-      <div class="amt">${money(tot.grandTotal)}</div>
-    </div>`;
-  }).join('');
-}
-document.querySelectorAll('.chip[data-hist]').forEach(c=>{
-  c.addEventListener('click', ()=>{
-    document.querySelectorAll('.chip[data-hist]').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    histFilter = c.dataset.hist;
-    renderHistory();
-  });
-});
 
 // default dates to today
-['f-date','s-date','d-date','t-date'].forEach(id=>{
-  document.getElementById(id).value = todayStr();
-});
+['f-date','s-date','d-date','e-date'].forEach(id=>{ document.getElementById(id).value = todayStr(); });
 
 loadAll();
 </script>
