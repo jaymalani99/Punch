@@ -5,22 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <title>Punch Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1C1B29;
-    --ink-soft:#726F8C;
-    --bg:#F7F7FB;
-    --line:#ECEAF4;
+    --ink:#1B1815;
+    --ink-soft:#79736A;
+    --bg:#F1F2F4;
+    --line:#E2E4E8;
+    --card:#FFFFFF;
 
-    --fuel-a:#FF7A59; --fuel-b:#FFB347;
-    --driver-a:#7C6FF0; --driver-b:#B9AEFF;
-    --service-a:#2FB8C6; --service-b:#8EE9E0;
-    --emi-a:#3E6BFF; --emi-b:#9FC1FF;
-    --dist-a:#34C77B; --dist-b:#A8E890;
+    --accent:#C2570F;
+    --accent-soft:#F3E2D4;
 
-    --radius-lg:22px;
-    --radius-md:16px;
+    --fuel:#B24E12;
+    --driver:#6B3E63;
+    --service:#2E6478;
+    --emi:#3E4A80;
+    --dist:#3F6B33;
+    --gold:#9C6B12;
+
+    --radius-lg:20px;
+    --radius-md:14px;
     --radius-sm:10px;
   }
   *{box-sizing:border-box;}
@@ -31,6 +36,7 @@
     color:var(--ink);
     -webkit-font-smoothing:antialiased;
   }
+  svg.ic{display:block;flex-shrink:0;}
   #app{
     max-width:480px;
     margin:0 auto;
@@ -41,20 +47,21 @@
   }
 
   /* ---------- Header ---------- */
-  .topbar{ padding:22px 20px 8px; display:flex; align-items:center; justify-content:space-between; }
+  .topbar{ padding:24px 20px 6px; }
   .topbar .greet{font-size:13px;color:var(--ink-soft);font-weight:500;}
-  .topbar h1{font-family:'Fredoka',sans-serif;font-size:26px;font-weight:600;margin:2px 0 0;}
+  .topbar h1{font-family:'Space Grotesk',sans-serif;font-size:25px;font-weight:600;margin:2px 0 0;letter-spacing:-0.01em;}
   .back-btn{
-    background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;
-    font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer;
+    background:none;border:none;padding:6px 0;
+    font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;
+    display:flex;align-items:center;gap:6px;
   }
 
   /* ---------- Period chips ---------- */
-  .period-row{ display:flex;gap:8px;padding:14px 20px 4px; }
+  .period-row{ display:flex;gap:8px;padding:16px 20px 4px; }
   .chip{
     font-family:'Inter',sans-serif; font-size:13px;font-weight:600;
-    padding:8px 14px;border-radius:999px; border:1.5px solid var(--line);
-    background:#fff;color:var(--ink-soft); cursor:pointer;
+    padding:8px 14px;border-radius:8px; border:1.5px solid var(--line);
+    background:var(--card);color:var(--ink-soft); cursor:pointer;
     transition:background .15s ease, color .15s ease, border-color .15s ease;
   }
   .chip.active{ background:var(--ink);border-color:var(--ink);color:#fff; }
@@ -62,109 +69,108 @@
   /* ---------- Hero card (tappable -> trends) ---------- */
   .hero{
     margin:14px 20px 0; background:var(--ink); border-radius:var(--radius-lg);
-    padding:22px 22px 18px; color:#fff; position:relative; overflow:hidden; cursor:pointer;
+    padding:20px 22px 18px; color:#fff; position:relative; cursor:pointer;
+    border-bottom:3px solid var(--accent);
   }
-  .hero::after{
-    content:""; position:absolute; right:-40px; top:-50px; width:170px;height:170px;border-radius:50%;
-    background:radial-gradient(circle at 30% 30%, rgba(255,122,89,.55), rgba(124,111,240,.25) 60%, transparent 70%);
-  }
-  .hero-nav{ display:flex; align-items:center; justify-content:center; gap:10px; position:relative; }
-  .hero .label{font-size:12.5px;color:rgba(255,255,255,.65);font-weight:500;position:relative;}
+  .hero-nav{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  .hero .label{font-size:12.5px;color:rgba(255,255,255,.6);font-weight:500;}
   .hero-arrow{
-    background:rgba(255,255,255,.12); border:none; color:#fff; width:26px;height:26px;border-radius:50%;
-    font-size:15px; cursor:pointer; display:flex;align-items:center;justify-content:center; flex-shrink:0; position:relative;
+    background:rgba(255,255,255,.1); border:none; color:#fff; width:24px;height:24px;border-radius:6px;
+    font-size:14px; cursor:pointer; display:flex;align-items:center;justify-content:center; flex-shrink:0;
   }
   .hero-arrow:disabled{opacity:.25; cursor:default;}
   .hero-arrow.hidden{visibility:hidden;}
-  .hero .amount{font-family:'Fredoka',sans-serif;font-size:38px;font-weight:600;margin:2px 0 4px;position:relative;}
-  .trend{ font-size:11.5px; font-weight:600; margin:0 0 12px; position:relative; }
-  .trend.up{color:#FFB4A8;} .trend.down{color:#9BFFC9;} .trend.flat{color:rgba(255,255,255,.6);}
-  .split-bar{ display:flex;height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.12);position:relative; }
+  .hero .amount{font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:600;margin:4px 0 3px;letter-spacing:-0.01em;}
+  .trend{ font-size:11.5px; font-weight:600; margin:0 0 14px; }
+  .trend.up{color:#E8A392;} .trend.down{color:#8FCBAA;} .trend.flat{color:rgba(255,255,255,.55);}
+  .split-bar{ display:flex;height:6px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.12); }
   .split-bar div{height:100%;}
-  .split-legend{ display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;position:relative; }
-  .split-legend span{ font-size:11px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:5px;font-weight:500; }
-  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
-  .hero-hint{
-    font-size:10.5px; color:rgba(255,255,255,.5); margin-top:12px; position:relative; font-weight:500;
-  }
+  .split-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px; }
+  .split-cell .n{font-size:9.5px;color:rgba(255,255,255,.55);font-weight:500;}
+  .split-cell .v{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#fff;margin-top:1px;}
+  .hero-hint{ font-size:10.5px; color:rgba(255,255,255,.4); margin-top:14px; font-weight:500; }
 
-  /* ---------- Category rows (minimal home summary) ---------- */
-  .cat-rows{ padding:16px 20px 4px; display:flex; flex-direction:column; gap:10px; }
-  .cat-row{
-    background:#fff; border:1px solid var(--line); border-radius:var(--radius-md);
-    padding:13px 14px; display:flex; align-items:center; gap:12px; cursor:pointer;
+  /* ---------- Category ledger (minimal home summary) ---------- */
+  .cat-rows{
+    margin:16px 20px 4px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md);
+    overflow:hidden;
   }
+  .cat-row{
+    padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .cat-row:last-child{ border-bottom:none; }
   .cat-ico{
-    width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-    font-size:18px;color:#fff;flex-shrink:0;
+    width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0; border:1.5px solid currentColor;
   }
   .cat-meta{flex:1;min-width:0;}
-  .cat-title{font-size:14px;font-weight:700;color:var(--ink);}
+  .cat-title{font-size:14px;font-weight:600;color:var(--ink);}
   .cat-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .cat-amt{font-family:'Fredoka',sans-serif;font-size:16.5px;font-weight:600;color:var(--ink);white-space:nowrap;}
-  .cat-chevron{color:var(--ink-soft);font-size:17px;margin-left:2px;}
+  .cat-amt{font-family:'Space Grotesk',sans-serif;font-size:15.5px;font-weight:600;color:var(--ink);white-space:nowrap;}
+  .cat-chevron{color:var(--ink-soft);margin-left:2px;flex-shrink:0;}
 
   /* ---------- Mini stat grid (used in category detail only) ---------- */
-  .grid{ display:grid;grid-template-columns:1fr 1fr;gap:12px; padding:4px 20px 4px; }
+  .grid{ display:grid;grid-template-columns:1fr 1fr;gap:10px; padding:4px 20px 4px; }
   .stat-card{
-    border-radius:var(--radius-md); padding:15px 14px; position:relative; overflow:hidden;
-    color:#fff; min-height:96px; display:flex;flex-direction:column;justify-content:space-between;
+    border-radius:var(--radius-md); padding:14px 14px; position:relative;
+    color:#fff; min-height:88px; display:flex;flex-direction:column;justify-content:space-between;
   }
-  .stat-card .icon{font-size:18px;}
-  .stat-card .stitle{font-size:11.5px;font-weight:600;opacity:.92;margin-top:6px;}
-  .stat-card .sval{font-family:'Fredoka',sans-serif;font-size:19px;font-weight:600;margin-top:2px;}
-  .stat-card .ssub{font-size:10px;opacity:.85;margin-top:3px;font-weight:500;}
-  .c-fuel{background:linear-gradient(135deg,var(--fuel-a),var(--fuel-b));}
-  .c-driver{background:linear-gradient(135deg,var(--driver-a),var(--driver-b));}
-  .c-service{background:linear-gradient(135deg,var(--service-a),var(--service-b));}
-  .c-emi{background:linear-gradient(135deg,var(--emi-a),var(--emi-b));}
-  .c-dist{background:linear-gradient(135deg,var(--dist-a),var(--dist-b));}
-  .c-flat{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
+  .stat-card .icon{opacity:.9;}
+  .stat-card .stitle{font-size:11.5px;font-weight:600;opacity:.85;margin-top:8px;}
+  .stat-card .sval{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;margin-top:2px;}
+  .stat-card .ssub{font-size:10px;opacity:.75;margin-top:3px;font-weight:500;}
+  .c-fuel{background:var(--fuel);}
+  .c-driver{background:var(--driver);}
+  .c-service{background:var(--service);}
+  .c-emi{background:var(--emi);}
+  .c-dist{background:var(--dist);}
+  .c-flat{background:var(--card);color:var(--ink);border:1.5px solid var(--line);}
   .c-flat .stitle{color:var(--ink-soft);opacity:1;}
   .c-flat .ssub{color:var(--ink-soft);opacity:1;}
-  .c-best{background:linear-gradient(135deg,#F5C242,#FFE29A);color:#5C4300;}
-  .c-best .stitle{opacity:.9;} .c-best .ssub{opacity:.85;}
+  .c-best{background:var(--gold);}
 
   /* ---------- Section ---------- */
-  .section-head{ display:flex;justify-content:space-between;align-items:baseline; padding:20px 20px 6px; }
-  .section-head h2{font-family:'Fredoka',sans-serif;font-size:17px;font-weight:600;margin:0;}
+  .section-head{ display:flex;justify-content:space-between;align-items:baseline; padding:22px 20px 8px; }
+  .section-head h2{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;margin:0;}
   .section-head a{font-size:12.5px;color:var(--ink-soft);font-weight:600;text-decoration:none;cursor:pointer;}
 
-  .entry-list{padding:0 20px;display:flex;flex-direction:column;gap:8px;}
-  .entry{
-    background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm);
-    padding:12px 14px;display:flex;align-items:center;gap:12px; cursor:pointer;
+  .entry-list{
+    margin:0 20px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md); overflow:hidden;
   }
+  .entry{
+    padding:13px 16px;display:flex;align-items:center;gap:12px; cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .entry:last-child{ border-bottom:none; }
   .entry .ico{
-    width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-    font-size:16px;flex-shrink:0;color:#fff;
+    width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0; border:1.5px solid currentColor;
   }
   .entry .meta{flex:1;min-width:0;}
   .entry .meta .t1{font-size:13.5px;font-weight:600;color:var(--ink);}
   .entry .meta .t2{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
-  .entry .amt{font-size:14px;font-weight:700;font-family:'Fredoka',sans-serif;white-space:nowrap;}
-  .empty-note{ padding:22px 20px;text-align:center;color:var(--ink-soft);font-size:13px; }
+  .entry .amt{font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif;white-space:nowrap;}
+  .empty-note{ padding:22px 16px;text-align:center;color:var(--ink-soft);font-size:13px; }
   .tag-backup{
-    display:inline-block;font-size:9.5px;font-weight:700;color:#8A6300;background:#FDE9B4;
-    border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:middle;
+    display:inline-block;font-size:10px;font-weight:600;color:var(--gold);background:#F4E9D2;
+    border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle;
   }
-  .del-x{ background:none;border:none;color:var(--ink-soft);font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0; }
+  .del-x{ background:none;border:none;color:var(--ink-soft);cursor:pointer;padding:2px 4px;flex-shrink:0; }
 
   /* ---------- Bottom nav ---------- */
   .navbar{
     position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-    width:100%;max-width:480px; background:#fff;border-top:1px solid var(--line);
+    width:100%;max-width:480px; background:var(--card);border-top:1px solid var(--line);
     display:flex;justify-content:space-around;align-items:center; padding:10px 6px 14px; z-index:50;
   }
   .navbtn{
-    background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
-    color:var(--ink-soft);font-size:10.5px;font-weight:600;font-family:'Inter',sans-serif; cursor:pointer;padding:4px 14px;
+    background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;
+    color:var(--ink-soft);font-size:10.5px;font-weight:600;font-family:'Inter',sans-serif; cursor:pointer;padding:4px 16px;
   }
-  .navbtn .nicon{font-size:19px;}
   .navbtn.active{color:var(--ink);}
-  .navbtn.addbtn .nicon{
-    background:var(--ink);color:#fff;width:38px;height:38px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:1px;
+  .navbtn.addbtn svg{
+    background:var(--ink);color:#fff;width:34px;height:34px;border-radius:10px;padding:7px;
   }
 
   /* ---------- Views ---------- */
@@ -174,22 +180,22 @@
   .type-tabs{display:flex;gap:7px;padding:16px 20px 4px;}
   .type-tab{
     flex:1;text-align:center;padding:10px 4px;border-radius:var(--radius-sm);
-    font-size:11.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);
+    font-size:11.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink-soft);
   }
-  .type-tab.active-fuel{background:linear-gradient(135deg,var(--fuel-a),var(--fuel-b));color:#fff;border-color:transparent;}
-  .type-tab.active-driver{background:linear-gradient(135deg,var(--driver-a),var(--driver-b));color:#fff;border-color:transparent;}
-  .type-tab.active-service{background:linear-gradient(135deg,var(--service-a),var(--service-b));color:#fff;border-color:transparent;}
-  .type-tab.active-emi{background:linear-gradient(135deg,var(--emi-a),var(--emi-b));color:#fff;border-color:transparent;}
+  .type-tab.active-fuel{background:var(--fuel);color:#fff;border-color:transparent;}
+  .type-tab.active-driver{background:var(--driver);color:#fff;border-color:transparent;}
+  .type-tab.active-service{background:var(--service);color:#fff;border-color:transparent;}
+  .type-tab.active-emi{background:var(--emi);color:#fff;border-color:transparent;}
 
   .form-card{
-    margin:14px 20px 0;background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);
+    margin:14px 20px 0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);
     padding:18px 18px 20px;
   }
   .field{margin-bottom:14px;}
   .field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
   .field input, .field select, .field textarea{
     width:100%;border:1.5px solid var(--line);border-radius:var(--radius-sm);
-    padding:11px 12px;font-size:14.5px;font-family:'Inter',sans-serif;color:var(--ink);background:#FBFBFD;
+    padding:11px 12px;font-size:14.5px;font-family:'Inter',sans-serif;color:var(--ink);background:#FBFBFB;
   }
   .field input:focus, .field select:focus, .field textarea:focus{outline:none;border-color:var(--ink);}
   .fueltype-row{display:flex;gap:8px;}
@@ -197,10 +203,10 @@
     flex:1;text-align:center;padding:10px 6px;border-radius:var(--radius-sm);
     border:1.5px solid var(--line);font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-soft);
   }
-  .fueltype-opt.sel-cng{background:linear-gradient(135deg,var(--fuel-a),var(--fuel-b));color:#fff;border-color:transparent;}
-  .fueltype-opt.sel-petrol{background:linear-gradient(135deg,#F0A93F,#F7D774);color:#7A5A0C;border-color:transparent;}
+  .fueltype-opt.sel-cng{background:var(--fuel);color:#fff;border-color:transparent;}
+  .fueltype-opt.sel-petrol{background:var(--gold);color:#fff;border-color:transparent;}
 
-  .backup-field{background:#FBFAF5;border:1.5px dashed #E9C46A;border-radius:var(--radius-sm);padding:10px 12px;margin-top:2px;}
+  .backup-field{background:#FAF7F1;border:1.5px dashed #D9C08C;border-radius:var(--radius-sm);padding:10px 12px;margin-top:2px;}
   .backup-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;}
   .backup-label input{width:auto;}
   .backup-hint{font-size:11px;color:var(--ink-soft);margin-top:5px;line-height:1.4;}
@@ -213,38 +219,38 @@
   .save-btn:disabled{opacity:.5;}
   .toast{
     position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
-    background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;
     opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease; z-index:100;
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
 
   .edit-banner{
-    margin:14px 20px 0;background:#EFEBFF;color:#4B3FBF;font-size:12.5px;font-weight:600;
+    margin:14px 20px 0;background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:600;
     padding:10px 14px;border-radius:var(--radius-sm);
   }
-  .edit-banner a{color:#4B3FBF;text-decoration:underline;cursor:pointer;}
+  .edit-banner a{color:var(--accent);text-decoration:underline;cursor:pointer;}
 
   /* History view */
   .hist-filters{display:flex;gap:7px;padding:16px 20px 4px;flex-wrap:wrap;}
-  .hist-list{padding:10px 20px 20px;display:flex;flex-direction:column;gap:8px;}
+  .hist-list{padding:10px 20px 20px;}
 
   /* Category detail view */
   .cat-header{ display:flex; align-items:center; gap:12px; padding:20px 20px 4px; }
   .cat-header .cat-ico-lg{
-    width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-    font-size:20px;color:#fff;flex-shrink:0;
+    width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0; border:1.5px solid currentColor;
   }
-  .cat-header h2{font-family:'Fredoka',sans-serif;font-size:20px;font-weight:600;margin:0;}
+  .cat-header h2{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;margin:0;}
   .cat-header .cat-period{font-size:12px;color:var(--ink-soft);margin-top:1px;}
   .cat-total-row{ padding:14px 20px 2px; }
-  .cat-total-row .amt{font-family:'Fredoka',sans-serif;font-size:30px;font-weight:600;color:var(--ink);}
+  .cat-total-row .amt{font-family:'Space Grotesk',sans-serif;font-size:29px;font-weight:600;color:var(--ink);}
   .cat-total-row .lbl{font-size:12px;color:var(--ink-soft);font-weight:600;}
 
   /* Past cycles & trends */
-  .chart-card{ margin:14px 20px 0; background:#fff; border:1px solid var(--line); border-radius:var(--radius-md); padding:14px 14px 6px; }
-  .chart-title{font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:4px;}
+  .chart-card{ margin:14px 20px 0; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md); padding:14px 14px 6px; }
+  .chart-title{font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:4px;}
 
-  h2.page-title{font-family:'Fredoka',sans-serif;font-size:20px;font-weight:600;margin:20px 20px 2px;}
+  h2.page-title{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;margin:20px 20px 2px;}
   p.page-sub{font-size:12.5px;color:var(--ink-soft);margin:0 20px 4px;}
 </style>
 </head>
@@ -256,7 +262,7 @@
   <div class="view active" id="view-home">
     <div class="topbar">
       <div>
-        <div class="greet">Hi Malani 👋</div>
+        <div class="greet">Hi Malani</div>
         <h1>Punch Tracker</h1>
       </div>
     </div>
@@ -270,14 +276,14 @@
     <div class="hero" id="heroCard" onclick="goto('view-pastcycles')">
       <div class="hero-nav">
         <button class="hero-arrow" id="arrowPrev" onclick="event.stopPropagation(); stepPeriod(-1)">‹</button>
-        <div class="label" id="periodLabel">Cycle · 10 Sep – 9 Oct</div>
+        <div class="label" id="periodLabel">10 Sep – 9 Oct</div>
         <button class="hero-arrow" id="arrowNext" onclick="event.stopPropagation(); stepPeriod(1)">›</button>
       </div>
       <div class="amount" id="heroTotal">₹0</div>
       <div class="trend" id="trendLine"></div>
       <div class="split-bar" id="splitBar"></div>
-      <div class="split-legend" id="splitLegend"></div>
-      <div class="hero-hint">Tap to see past cycles &amp; trends ›</div>
+      <div class="split-grid" id="splitGrid"></div>
+      <div class="hero-hint">Tap for past cycles and trends</div>
     </div>
 
     <div class="cat-rows" id="catRows"></div>
@@ -293,7 +299,7 @@
   <!-- ============ CATEGORY DETAIL ============ -->
   <div class="view" id="view-category">
     <div class="cat-header">
-      <button class="back-btn" onclick="goto('view-home')">‹ Back</button>
+      <button class="back-btn" onclick="goto('view-home')" id="catBackBtn">‹ Back</button>
     </div>
     <div class="cat-header" style="padding-top:6px;">
       <div class="cat-ico-lg" id="catDetailIco"></div>
@@ -319,10 +325,10 @@
       Editing this entry — <a onclick="cancelEdit()">cancel</a>
     </div>
     <div class="type-tabs" id="typeTabs">
-      <div class="type-tab active-fuel" data-type="fuel" onclick="setAddType('fuel')">⛽ Fuel</div>
-      <div class="type-tab" data-type="service" onclick="setAddType('service')">🧰 Service</div>
-      <div class="type-tab" data-type="driver" onclick="setAddType('driver')">🧑‍✈️ Driver</div>
-      <div class="type-tab" data-type="emi" onclick="setAddType('emi')">🏦 EMI</div>
+      <div class="type-tab active-fuel" data-type="fuel" onclick="setAddType('fuel')">Fuel</div>
+      <div class="type-tab" data-type="service" onclick="setAddType('service')">Service</div>
+      <div class="type-tab" data-type="driver" onclick="setAddType('driver')">Driver</div>
+      <div class="type-tab" data-type="emi" onclick="setAddType('emi')">EMI</div>
     </div>
 
     <div class="form-card" id="fuelForm">
@@ -387,23 +393,23 @@
     <h2 class="page-title" style="margin-top:8px;">Past cycles &amp; trends</h2>
     <p class="page-sub">Tap a month to jump in, or switch to charts.</p>
     <div class="type-tabs">
-      <div class="type-tab active-fuel" id="subtab-list" data-sub="list" onclick="setPastTab('list')">📋 List</div>
-      <div class="type-tab" id="subtab-charts" data-sub="charts" onclick="setPastTab('charts')">📈 Charts</div>
+      <div class="type-tab active-fuel" id="subtab-list" data-sub="list" onclick="setPastTab('list')">List</div>
+      <div class="type-tab" id="subtab-charts" data-sub="charts" onclick="setPastTab('charts')">Charts</div>
     </div>
     <div id="pastListWrap">
       <div class="entry-list" id="pastCyclesList" style="padding-top:14px; padding-bottom:16px;"></div>
     </div>
     <div id="pastChartsWrap" style="display:none;">
       <div class="chart-card">
-        <div class="chart-title">Cycle totals · last 6 months</div>
+        <div class="chart-title">Cycle totals, last 6 months</div>
         <div id="chartCycles"></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Weekly expense · last 8 weeks</div>
+        <div class="chart-title">Weekly expense, last 8 weeks</div>
         <div id="chartWeeklyExpense"></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Weekly distance · last 8 weeks</div>
+        <div class="chart-title">Weekly distance, last 8 weeks</div>
         <div id="chartWeeklyDistance"></div>
       </div>
     </div>
@@ -412,13 +418,13 @@
   <!-- ============ NAV ============ -->
   <div class="navbar">
     <button class="navbtn active" data-view="view-home" onclick="goto('view-home')">
-      <div class="nicon">🏠</div>Home
+      <svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>Home
     </button>
     <button class="navbtn addbtn" data-view="view-add" onclick="goto('view-add')">
-      <div class="nicon">+</div>Add
+      <svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add
     </button>
     <button class="navbtn" data-view="view-history" onclick="goto('view-history')">
-      <div class="nicon">📋</div>History
+      <svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>History
     </button>
   </div>
 
@@ -442,6 +448,27 @@ let fuelTypeSel = 'CNG';
 let histFilter = 'all';
 let editState = { kind:null, id:null };
 let currentCategory = null; // which category detail page is open
+
+/* ================== ICONS (monoline SVG, no emoji) ================== */
+const ICONS = {
+  fuel: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v13"/><path d="M3 21h10"/><path d="M12 9h1.8L16 11v5a1.3 1.3 0 0 0 2.6 0V9.8L16.5 7"/><path d="M6 5V3h4v2"/></svg>',
+  driver: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 6v3.6M8 15.6L6.3 18M16 15.6l1.7 2.4"/></svg>',
+  service: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a3.5 3.5 0 0 1-4.7 4.7L4.8 16.2a1.7 1.7 0 0 0 2.4 2.4L12.2 13.7a3.5 3.5 0 0 1 4.7-4.7l-2.3 2.3-1.7-.4-.4-1.7z"/></svg>',
+  emi: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 4l9 5.5"/><path d="M5 9.5V19M10 9.5V19M14 9.5V19M19 9.5V19"/><path d="M3 19h18"/></svg>',
+  distance: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20L10 4h1.6L17 20"/><path d="M9.3 13.5h5.4"/></svg>',
+  calendar: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M16 3v4M8 3v4M3.5 10h17"/></svg>',
+  trophy: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v4.2a4 4 0 0 1-8 0V4z"/><path d="M8 5.3H5.3a3 3 0 0 0 3 3.7M16 5.3h2.7a3 3 0 0 1-3 3.7"/><path d="M12 12.2v2.6M9.3 20h5.4M10 16h4v1.6a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2V16z"/></svg>',
+  clock: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7.8"/><path d="M12 7.8v4.6l3 1.8"/></svg>',
+  costPerKm: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l5-6 4 4 7-8"/><path d="M20 4h-4.5V8.5"/></svg>',
+  flame: '<svg class="ic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5s5 4.3 5 9.3a5 5 0 0 1-10 0c0-1 .4-2 .9-2.9.4 1 1.1 1.4 1.6.9.5-.6 0-2-.5-3.1 1 .1 3-.7 3-4.2z"/></svg>',
+};
+function iconFor(kind){
+  if(kind==='fuel') return {ico:ICONS.fuel, color:'var(--fuel)'};
+  if(kind==='service') return {ico:ICONS.service, color:'var(--service)'};
+  if(kind==='driver') return {ico:ICONS.driver, color:'var(--driver)'};
+  if(kind==='emi') return {ico:ICONS.emi, color:'var(--emi)'};
+  return {ico:'', color:'var(--ink-soft)'};
+}
 
 /* ================== DATE HELPERS ================== */
 function toDate(str){ return new Date(str + 'T12:00:00'); }
@@ -467,7 +494,7 @@ function cycleLabel(key){
   const [y,m] = key.split('-').map(Number);
   const start = new Date(y, m-1, 10); const end = new Date(y, m, 9);
   const fmt = (d)=> d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-  return `Cycle · ${fmt(start)} – ${fmt(end)}`;
+  return `${fmt(start)} – ${fmt(end)}`;
 }
 function cycleShortLabel(key){
   const [y,m] = key.split('-').map(Number);
@@ -484,7 +511,7 @@ function activeWeekKey(){ return weekKeyWithOffset(weekOffset); }
 function weekLabel(key){
   const s = toDate(key); const e = new Date(s); e.setDate(e.getDate()+6);
   const fmt = (d)=> d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-  return `Week · ${fmt(s)} – ${fmt(e)}`;
+  return `${fmt(s)} – ${fmt(e)}`;
 }
 function weekShortLabel(key){ return toDate(key).toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
 function weekRangeForKey(key){ const start = toDate(key); const end = new Date(start); end.setDate(end.getDate()+6); return { start, end }; }
@@ -648,23 +675,24 @@ function render(){
     } else { trendEl.textContent = ''; }
   } else { trendEl.textContent = ''; }
 
-  // split bar
+  // split bar + grid
   const bar = document.getElementById('splitBar');
-  const legend = document.getElementById('splitLegend');
-  bar.innerHTML=''; legend.innerHTML='';
+  const grid = document.getElementById('splitGrid');
+  bar.innerHTML=''; grid.innerHTML='';
   const parts = [
-    {name:'Fuel', val: st.fuelTotal, grad:'linear-gradient(90deg,var(--fuel-a),var(--fuel-b))', dot:'var(--fuel-a)'},
-    {name:'Driver', val: st.driverTotal, grad:'linear-gradient(90deg,var(--driver-a),var(--driver-b))', dot:'var(--driver-a)'},
-    {name:'Service', val: st.serviceTotal, grad:'linear-gradient(90deg,var(--service-a),var(--service-b))', dot:'var(--service-a)'},
-    {name:'EMI', val: st.emiTotal, grad:'linear-gradient(90deg,var(--emi-a),var(--emi-b))', dot:'var(--emi-a)'},
+    {name:'Fuel', val: st.fuelTotal, col:'var(--fuel)'},
+    {name:'Driver', val: st.driverTotal, col:'var(--driver)'},
+    {name:'Service', val: st.serviceTotal, col:'var(--service)'},
+    {name:'EMI', val: st.emiTotal, col:'var(--emi)'},
   ];
   const total = st.grandTotal || 1;
   parts.forEach(p=>{
     const w = (p.val/total*100).toFixed(1);
-    if(p.val>0){ const seg = document.createElement('div'); seg.style.width = w+'%'; seg.style.background = p.grad; bar.appendChild(seg); }
-    const leg = document.createElement('span');
-    leg.innerHTML = `<span class="dot" style="background:${p.dot}"></span>${p.name} ${money(p.val)}`;
-    legend.appendChild(leg);
+    if(p.val>0){ const seg = document.createElement('div'); seg.style.width = w+'%'; seg.style.background = p.col; bar.appendChild(seg); }
+    const cell = document.createElement('div');
+    cell.className = 'split-cell';
+    cell.innerHTML = `<div class="n">${p.name}</div><div class="v">${money(p.val)}</div>`;
+    grid.appendChild(cell);
   });
 
   // minimal category rows
@@ -674,21 +702,23 @@ function render(){
   const serviceCount = SERVICE.filter(x=>inPeriod(x.expense_date)).length;
   const emiCount = EMI.filter(x=>inPeriod(x.expense_date)).length;
   const fuelSub = st.totalKm>0
-    ? `${Math.round(st.totalKm)} km${st.cngAvg ? ' · '+st.cngAvg.toFixed(1)+' km/kg avg' : ''}`
-    : 'No distance yet · add another fill-up';
+    ? `${Math.round(st.totalKm)} km driven${st.cngAvg ? ', ' +st.cngAvg.toFixed(1)+' km/kg average' : ''}`
+    : 'No distance yet, add another fill-up';
   const rows = [
-    { kind:'fuel', icon:'⛽', grad:'linear-gradient(135deg,var(--fuel-a),var(--fuel-b))', title:'Fuel', amt:st.fuelTotal, sub:fuelSub },
-    { kind:'driver', icon:'🧑‍✈️', grad:'linear-gradient(135deg,var(--driver-a),var(--driver-b))', title:'Driver', amt:st.driverTotal, sub:`${driverCount} payment${driverCount===1?'':'s'}` },
-    { kind:'service', icon:'🧰', grad:'linear-gradient(135deg,var(--service-a),var(--service-b))', title:'Service & other', amt:st.serviceTotal, sub:`${serviceCount} expense${serviceCount===1?'':'s'}` },
-    { kind:'emi', icon:'🏦', grad:'linear-gradient(135deg,var(--emi-a),var(--emi-b))', title:'Car EMI', amt:st.emiTotal, sub:`${emiCount} payment${emiCount===1?'':'s'}` },
+    { kind:'fuel', title:'Fuel', amt:st.fuelTotal, sub:fuelSub },
+    { kind:'driver', title:'Driver', amt:st.driverTotal, sub:`${driverCount} payment${driverCount===1?'':'s'}` },
+    { kind:'service', title:'Service & other', amt:st.serviceTotal, sub:`${serviceCount} expense${serviceCount===1?'':'s'}` },
+    { kind:'emi', title:'Car EMI', amt:st.emiTotal, sub:`${emiCount} payment${emiCount===1?'':'s'}` },
   ];
-  rowsEl.innerHTML = rows.map(r=>`
-    <div class="cat-row" onclick="openCategory('${r.kind}')">
-      <div class="cat-ico" style="background:${r.grad}">${r.icon}</div>
+  rowsEl.innerHTML = rows.map(r=>{
+    const {ico,color} = iconFor(r.kind);
+    return `<div class="cat-row" onclick="openCategory('${r.kind}')">
+      <div class="cat-ico" style="color:${color}">${ico}</div>
       <div class="cat-meta"><div class="cat-title">${r.title}</div><div class="cat-sub">${r.sub}</div></div>
       <div class="cat-amt">${money(r.amt)}</div>
-      <div class="cat-chevron">›</div>
-    </div>`).join('');
+      <svg class="ic cat-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>`;
+  }).join('');
 
   renderRecent();
   renderHistory();
@@ -696,16 +726,13 @@ function render(){
   if(currentCategory) renderCategoryDetail();
 }
 
-function iconFor(kind){
-  if(kind==='fuel') return {ico:'⛽', bg:'linear-gradient(135deg,var(--fuel-a),var(--fuel-b))'};
-  if(kind==='service') return {ico:'🧰', bg:'linear-gradient(135deg,var(--service-a),var(--service-b))'};
-  if(kind==='driver') return {ico:'🧑‍✈️', bg:'linear-gradient(135deg,var(--driver-a),var(--driver-b))'};
-  if(kind==='emi') return {ico:'🏦', bg:'linear-gradient(135deg,var(--emi-a),var(--emi-b))'};
-  return {ico:'•', bg:'#ccc'};
-}
 function allEntries(){
   const items = [];
-  FUEL.forEach(x=>items.push({kind:'fuel', date:x.fill_date, title:`${x.fuel_type} fill-up${x.is_backup?' <span class="tag-backup">BACKUP</span>':''}`, sub:`${x.quantity}${x.fuel_type==='CNG'?'kg':'L'} · odo ${x.odometer}km${x.location ? ' · '+x.location : ''}`, amount:x.amount, id:x.id}));
+  FUEL.forEach(x=>{
+    const qtyStr = `${x.quantity}${x.fuel_type==='CNG'?'kg':'L'} ${x.fuel_type}`;
+    const locStr = x.location ? `, ${x.location}` : '';
+    items.push({kind:'fuel', date:x.fill_date, title:`${x.fuel_type} fill-up${x.is_backup?' <span class="tag-backup">Backup</span>':''}`, sub:`${qtyStr}, odometer ${x.odometer}km${locStr}`, amount:x.amount, id:x.id});
+  });
   SERVICE.forEach(x=>items.push({kind:'service', date:x.expense_date, title:x.note || 'Service expense', sub:'Service & other', amount:x.amount, id:x.id}));
   DRIVER.forEach(x=>items.push({kind:'driver', date:x.expense_date, title:x.note || 'Driver expense', sub:'Driver', amount:x.amount, id:x.id}));
   EMI.forEach(x=>items.push({kind:'emi', date:x.expense_date, title:x.note || 'Car EMI', sub:'EMI', amount:x.amount, id:x.id}));
@@ -713,12 +740,12 @@ function allEntries(){
   return items;
 }
 function entryRowHtml(it, withDelete){
-  const {ico,bg} = iconFor(it.kind);
+  const {ico,color} = iconFor(it.kind);
   return `<div class="entry" onclick="openEditEntry('${it.kind}','${it.id}')">
-    <div class="ico" style="background:${bg}">${ico}</div>
-    <div class="meta"><div class="t1">${it.title}</div><div class="t2">${fmtDate(it.date)} · ${it.sub}</div></div>
+    <div class="ico" style="color:${color}">${ico}</div>
+    <div class="meta"><div class="t1">${it.title}</div><div class="t2">${fmtDate(it.date)}, ${it.sub}</div></div>
     <div class="amt">${money(it.amount)}</div>
-    ${withDelete ? `<button class="del-x" onclick="event.stopPropagation(); deleteEntry('${it.kind}','${it.id}')">✕</button>` : ''}
+    ${withDelete ? `<button class="del-x" onclick="event.stopPropagation(); deleteEntry('${it.kind}','${it.id}')"><svg class="ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>` : ''}
   </div>`;
 }
 function renderRecent(){
@@ -745,9 +772,9 @@ function renderCategoryDetail(){
   const kind = currentCategory;
   if(!kind) return;
   const st = computeStats();
-  const {ico,bg} = iconFor(kind);
-  document.getElementById('catDetailIco').style.background = bg;
-  document.getElementById('catDetailIco').textContent = ico;
+  const {ico,color} = iconFor(kind);
+  document.getElementById('catDetailIco').style.color = color;
+  document.getElementById('catDetailIco').innerHTML = ico;
   const titles = { fuel:'Fuel', driver:'Driver', service:'Service & other', emi:'Car EMI' };
   document.getElementById('catDetailTitle').textContent = titles[kind];
   let label = 'All time';
@@ -758,16 +785,16 @@ function renderCategoryDetail(){
   const amtMap = { fuel: st.fuelTotal, driver: st.driverTotal, service: st.serviceTotal, emi: st.emiTotal };
   document.getElementById('catDetailAmt').textContent = money(amtMap[kind]);
   document.getElementById('catDetailSub').textContent =
-    kind==='fuel' ? `CNG ${money(st.fuelCngCost)} · Petrol ${money(st.fuelPetrolCost)}` : 'Total this period';
+    kind==='fuel' ? `CNG ${money(st.fuelCngCost)}, Petrol ${money(st.fuelPetrolCost)}` : 'Total this period';
 
   const extra = document.getElementById('catExtraStats');
   if(kind==='fuel'){
     extra.style.display = 'grid';
     extra.innerHTML = `
-      <div class="stat-card c-flat"><div class="icon">📉</div><div><div class="stitle">Cost per km</div><div class="sval">${st.costPerKm ? '₹'+st.costPerKm.toFixed(1) : '–'}</div><div class="ssub">${st.costPerKm?'overall':'needs 2+ fills'}</div></div></div>
-      <div class="stat-card c-flat"><div class="icon">🔥</div><div><div class="stitle">CNG average</div><div class="sval">${st.cngAvg ? st.cngAvg.toFixed(1) : '–'}</div><div class="ssub">km per kg</div></div></div>
-      <div class="stat-card c-best"><div class="icon">🏆</div><div><div class="stitle">Best average</div><div class="sval">${st.best ? st.best.avg.toFixed(1)+' '+unitFor(st.best.type) : '–'}</div><div class="ssub">${st.best ? (st.best.location ? st.best.location+' · '+fmtDate(st.best.date) : fmtDate(st.best.date)) : 'needs 2+ fills'}</div></div></div>
-      <div class="stat-card c-flat"><div class="icon">🕓</div><div><div class="stitle">Last fill average</div><div class="sval">${st.last ? st.last.avg.toFixed(1)+' '+unitFor(st.last.type) : '–'}</div><div class="ssub">${st.last ? fmtDate(st.last.date) : 'needs 2+ fills'}</div></div></div>
+      <div class="stat-card c-flat"><div class="icon">${ICONS.costPerKm}</div><div><div class="stitle">Cost per km</div><div class="sval">${st.costPerKm ? '₹'+st.costPerKm.toFixed(1) : '–'}</div><div class="ssub">${st.costPerKm?'overall':'needs 2+ fills'}</div></div></div>
+      <div class="stat-card c-flat"><div class="icon">${ICONS.flame}</div><div><div class="stitle">CNG average</div><div class="sval">${st.cngAvg ? st.cngAvg.toFixed(1) : '–'}</div><div class="ssub">km per kg</div></div></div>
+      <div class="stat-card c-best"><div class="icon">${ICONS.trophy}</div><div><div class="stitle">Best average</div><div class="sval">${st.best ? st.best.avg.toFixed(1)+' '+unitFor(st.best.type) : '–'}</div><div class="ssub">${st.best ? (st.best.location ? st.best.location+', '+fmtDate(st.best.date) : fmtDate(st.best.date)) : 'needs 2+ fills'}</div></div></div>
+      <div class="stat-card c-flat"><div class="icon">${ICONS.clock}</div><div><div class="stitle">Last fill average</div><div class="sval">${st.last ? st.last.avg.toFixed(1)+' '+unitFor(st.last.type) : '–'}</div><div class="ssub">${st.last ? fmtDate(st.last.date) : 'needs 2+ fills'}</div></div></div>
     `;
   } else {
     extra.style.display = 'none';
@@ -996,8 +1023,8 @@ function renderPastCycles(){
     const tot = expenseTotalsForPredicate(d=>cycleKey(d)===key);
     const isCurrent = key === currentCycleKey();
     return `<div class="entry" onclick="jumpToCycle('${key}')">
-      <div class="ico" style="background:linear-gradient(135deg,var(--driver-a),var(--driver-b));">📅</div>
-      <div class="meta"><div class="t1">${cycleLabel(key)}${isCurrent?' · current':''}</div><div class="t2">Fuel ${money(tot.fuelTotal)} · Driver ${money(tot.driverTotal)} · Service ${money(tot.serviceTotal)} · EMI ${money(tot.emiTotal)}</div></div>
+      <div class="ico" style="color:var(--driver)">${ICONS.calendar}</div>
+      <div class="meta"><div class="t1">${cycleLabel(key)}${isCurrent?', current':''}</div><div class="t2">Fuel ${money(tot.fuelTotal)}, Driver ${money(tot.driverTotal)}, Service ${money(tot.serviceTotal)}, EMI ${money(tot.emiTotal)}</div></div>
       <div class="amt">${money(tot.grandTotal)}</div>
     </div>`;
   }).join('');
