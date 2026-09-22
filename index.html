@@ -110,6 +110,17 @@
   .cat-amt{font-family:'Space Grotesk',sans-serif;font-size:15.5px;font-weight:600;color:var(--ink);white-space:nowrap;}
   .cat-chevron{color:var(--ink-soft);margin-left:2px;flex-shrink:0;}
 
+  .mileage-strip{
+    margin:12px 20px 0; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md);
+    display:flex; cursor:pointer;
+  }
+  .m-cell{ flex:1; padding:13px 15px; display:flex; align-items:center; gap:10px; min-width:0; }
+  .m-cell:first-child{ border-right:1px solid var(--line); }
+  .m-cell .m-ico{flex-shrink:0;}
+  .m-cell .m-label{font-size:10.5px;color:var(--ink-soft);font-weight:600;}
+  .m-cell .m-val{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;color:var(--ink);margin-top:1px;}
+  .m-cell .m-sub{font-size:10px;color:var(--ink-soft);margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
   /* ---------- Mini stat grid (used in category detail only) ---------- */
   .grid{ display:grid;grid-template-columns:1fr 1fr;gap:10px; padding:4px 20px 4px; }
   .stat-card{
@@ -283,10 +294,12 @@
       <div class="trend" id="trendLine"></div>
       <div class="split-bar" id="splitBar"></div>
       <div class="split-grid" id="splitGrid"></div>
-      <div class="hero-hint">Tap for past cycles and trends</div>
+      <div class="hero-hint">Tap for trends</div>
     </div>
 
     <div class="cat-rows" id="catRows"></div>
+
+    <div class="mileage-strip" id="mileageStrip" onclick="openCategory('fuel')"></div>
 
     <div class="section-head">
       <h2>Recent entries</h2>
@@ -387,33 +400,25 @@
     <div class="hist-list" id="histList"></div>
   </div>
 
-  <!-- ============ PAST CYCLES & TRENDS ============ -->
+  <!-- ============ TRENDS ============ -->
   <div class="view" id="view-pastcycles">
     <div class="cat-header"><button class="back-btn" onclick="goto('view-home')">‹ Back</button></div>
-    <h2 class="page-title" style="margin-top:8px;">Past cycles &amp; trends</h2>
-    <p class="page-sub">Tap a month to jump in, or switch to charts.</p>
-    <div class="type-tabs">
-      <div class="type-tab active-fuel" id="subtab-list" data-sub="list" onclick="setPastTab('list')">List</div>
-      <div class="type-tab" id="subtab-charts" data-sub="charts" onclick="setPastTab('charts')">Charts</div>
+    <h2 class="page-title" style="margin-top:8px;">Trends</h2>
+    <p class="page-sub">Cycle and weekly patterns over time.</p>
+    <div class="chart-card">
+      <div class="chart-title">Cycle totals, last 6 months</div>
+      <div id="chartCycles"></div>
     </div>
-    <div id="pastListWrap">
-      <div class="entry-list" id="pastCyclesList" style="padding-top:14px; padding-bottom:16px;"></div>
+    <div class="chart-card">
+      <div class="chart-title">Weekly expense, last 8 weeks</div>
+      <div id="chartWeeklyExpense"></div>
     </div>
-    <div id="pastChartsWrap" style="display:none;">
-      <div class="chart-card">
-        <div class="chart-title">Cycle totals, last 6 months</div>
-        <div id="chartCycles"></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Weekly expense, last 8 weeks</div>
-        <div id="chartWeeklyExpense"></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Weekly distance, last 8 weeks</div>
-        <div id="chartWeeklyDistance"></div>
-      </div>
+    <div class="chart-card">
+      <div class="chart-title">Weekly distance, last 8 weeks</div>
+      <div id="chartWeeklyDistance"></div>
     </div>
   </div>
+
 
   <!-- ============ NAV ============ -->
   <div class="navbar">
@@ -720,9 +725,23 @@ function render(){
     </div>`;
   }).join('');
 
+  // mileage highlight strip — current-period average vs all-time best
+  const periodWordShort = period==='cycle' ? 'This cycle' : period==='week' ? 'This week' : 'All-time';
+  const stripEl = document.getElementById('mileageStrip');
+  stripEl.innerHTML = `
+    <div class="m-cell">
+      <div class="m-ico" style="color:var(--fuel)">${ICONS.flame}</div>
+      <div><div class="m-label">${periodWordShort} avg</div><div class="m-val">${st.cngAvg ? st.cngAvg.toFixed(1)+' km/kg' : '–'}</div><div class="m-sub">${st.cngAvg ? '' : 'needs 2+ fills'}</div></div>
+    </div>
+    <div class="m-cell">
+      <div class="m-ico" style="color:var(--gold)">${ICONS.trophy}</div>
+      <div><div class="m-label">Best ever</div><div class="m-val">${st.best ? st.best.avg.toFixed(1)+' '+unitFor(st.best.type) : '–'}</div><div class="m-sub">${st.best ? (st.best.location || fmtDate(st.best.date)) : 'needs 2+ fills'}</div></div>
+    </div>
+  `;
+
   renderRecent();
   renderHistory();
-  renderPastCycles();
+  renderCharts();
   if(currentCategory) renderCategoryDetail();
 }
 
@@ -1002,33 +1021,6 @@ document.querySelectorAll('.chip[data-hist]').forEach(c=>{
   });
 });
 
-/* ---------- Past cycles & trends ---------- */
-function jumpToCycle(key){
-  period = 'cycle';
-  cycleOffset = cycleOffsetForKey(key);
-  document.querySelectorAll('.chip[data-period]').forEach(x=>x.classList.toggle('active', x.dataset.period==='cycle'));
-  goto('view-home');
-  render();
-}
-function renderPastCycles(){
-  const el = document.getElementById('pastCyclesList');
-  if(!el) return;
-  const keys = new Set([currentCycleKey()]);
-  FUEL.forEach(x=>keys.add(cycleKey(x.fill_date)));
-  SERVICE.forEach(x=>keys.add(cycleKey(x.expense_date)));
-  DRIVER.forEach(x=>keys.add(cycleKey(x.expense_date)));
-  EMI.forEach(x=>keys.add(cycleKey(x.expense_date)));
-  const sorted = Array.from(keys).sort().reverse();
-  el.innerHTML = sorted.map(key=>{
-    const tot = expenseTotalsForPredicate(d=>cycleKey(d)===key);
-    const isCurrent = key === currentCycleKey();
-    return `<div class="entry" onclick="jumpToCycle('${key}')">
-      <div class="ico" style="color:var(--driver)">${ICONS.calendar}</div>
-      <div class="meta"><div class="t1">${cycleLabel(key)}${isCurrent?', current':''}</div><div class="t2">Fuel ${money(tot.fuelTotal)}, Driver ${money(tot.driverTotal)}, Service ${money(tot.serviceTotal)}, EMI ${money(tot.emiTotal)}</div></div>
-      <div class="amt">${money(tot.grandTotal)}</div>
-    </div>`;
-  }).join('');
-}
 function buildCycleSeries(n){
   const arr = [];
   for(let off=-(n-1); off<=0; off++){
@@ -1048,7 +1040,7 @@ function buildWeeklySeries(n){
   }
   return arr;
 }
-function renderBarChart(elId, items, colorA, colorB, valueFmt){
+function renderBarChart(elId, items, color, valueFmt){
   const el = document.getElementById(elId);
   if(!el) return;
   const w = 320, h = 140, padBottom = 22, padTop = 18, gap = 8;
@@ -1059,27 +1051,17 @@ function renderBarChart(elId, items, colorA, colorB, valueFmt){
     const barH = maxVal>0 ? (it.value/maxVal)*(h-padTop-padBottom) : 0;
     const x = gap + idx*(barW+gap);
     const y = h - padBottom - barH;
-    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH,2).toFixed(1)}" rx="5" fill="url(#g-${elId})"></rect>`;
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH,2).toFixed(1)}" rx="4" fill="${color}"></rect>`;
     bars += `<text x="${(x+barW/2).toFixed(1)}" y="${h-padBottom+13}" font-size="8.5" fill="#9B98AC" text-anchor="middle" font-family="Inter,sans-serif">${it.label}</text>`;
-    if(it.value>0){ bars += `<text x="${(x+barW/2).toFixed(1)}" y="${(y-4).toFixed(1)}" font-size="8.5" font-weight="700" fill="#1C1B29" text-anchor="middle" font-family="Inter,sans-serif">${valueFmt(it.value)}</text>`; }
+    if(it.value>0){ bars += `<text x="${(x+barW/2).toFixed(1)}" y="${(y-4).toFixed(1)}" font-size="8.5" font-weight="700" fill="#1B1815" text-anchor="middle" font-family="Inter,sans-serif">${valueFmt(it.value)}</text>`; }
   });
-  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="xMidYMid meet">
-    <defs><linearGradient id="g-${elId}" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="${colorA}"/><stop offset="100%" stop-color="${colorB}"/></linearGradient></defs>
-    ${bars}
-  </svg>`;
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="xMidYMid meet">${bars}</svg>`;
 }
 function renderCharts(){
-  renderBarChart('chartCycles', buildCycleSeries(6), '#7C6FF0', '#B9AEFF', v=>'₹'+Math.round(v));
+  renderBarChart('chartCycles', buildCycleSeries(6), '#6B3E63', v=>'₹'+Math.round(v));
   const wk = buildWeeklySeries(8);
-  renderBarChart('chartWeeklyExpense', wk.map(x=>({label:x.label, value:x.expense})), '#FF7A59', '#FFB347', v=>'₹'+Math.round(v));
-  renderBarChart('chartWeeklyDistance', wk.map(x=>({label:x.label, value:x.distance})), '#34C77B', '#A8E890', v=>Math.round(v)+' km');
-}
-function setPastTab(tab){
-  document.getElementById('subtab-list').classList.toggle('active-fuel', tab==='list');
-  document.getElementById('subtab-charts').classList.toggle('active-fuel', tab==='charts');
-  document.getElementById('pastListWrap').style.display = tab==='list' ? 'block' : 'none';
-  document.getElementById('pastChartsWrap').style.display = tab==='charts' ? 'block' : 'none';
-  if(tab==='charts') renderCharts();
+  renderBarChart('chartWeeklyExpense', wk.map(x=>({label:x.label, value:x.expense})), '#B24E12', v=>'₹'+Math.round(v));
+  renderBarChart('chartWeeklyDistance', wk.map(x=>({label:x.label, value:x.distance})), '#3F6B33', v=>Math.round(v)+' km');
 }
 
 // default dates to today
